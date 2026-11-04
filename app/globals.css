@@ -226,3 +226,28 @@ body::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
+
+/* Aged paper for the Constitution book: yellowed base, fine grain, faint mottled stains, a few
+   foxing spots, edges browning toward the border and a darker gutter along the spine (left). */
+.paper-vintage {
+  background-color: #efdfbb;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .38 0 0 0 0 .26 0 0 0 0 .1 .55 0 0 0 -.12'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800' preserveAspectRatio='none'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008 .012' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .36 0 0 0 0 .12 1.1 0 0 0 -.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 16% 84%, rgba(150, 95, 35, 0.22) 0 0.6%, transparent 1.4%),
+    radial-gradient(circle at 82% 12%, rgba(150, 95, 35, 0.18) 0 0.8%, transparent 1.8%),
+    radial-gradient(circle at 74% 66%, rgba(150, 95, 35, 0.12) 0 0.5%, transparent 1.2%),
+    radial-gradient(circle at 28% 22%, rgba(150, 95, 35, 0.1) 0 1%, transparent 2.4%),
+    linear-gradient(var(--gutter, to right), rgba(90, 55, 20, 0.3), rgba(90, 55, 20, 0.08) 6%, transparent 14%),
+    radial-gradient(ellipse 75% 70% at 55% 50%, transparent 55%, rgba(125, 78, 25, 0.32) 100%);
+  background-size: 240px 240px, 100% 100%, auto, auto, auto, auto, auto, auto;
+}
+/* For a left-hand page, whose spine (and gutter) is on its right edge. */
+.paper-gutter-right {
+  --gutter: to left;
+}
+/* Ink that has faded a little into the paper. */
+.ink-faded {
+  color: #3a2a1a;
+  text-shadow: 0 0 0.6px rgba(58, 42, 26, 0.35);
+}
