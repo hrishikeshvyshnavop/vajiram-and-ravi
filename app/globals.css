@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  /* Light-only design: no dark theme, so the page never shows a dark body behind sections. */
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -9,18 +10,219 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-headline: var(--font-stack-headline);
+  --font-display: var(--font-figtree);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Iteration 3 (/v3): design tokens of the current Vajiram & Ravi site, so its ported markup
+   resolves to the same values. New names only; the overrides that would clash (its greys,
+   logo, base font) are scoped to the .v3 wrapper below. */
+@theme {
+  --color-ink: #1c1917;
+  --color-line: #e4e4e4;
+  --color-line-warm: #e8e4df;
+  --color-control: #ccc;
+  --color-media: #ede8e2;
+  --color-brand-50: #fef8ec;
+  --color-brand-100: #fceac9;
+  --color-brand-500: #e57512;
+  --color-brand-600: #d1570e;
+  --color-brand-700: #ae3b0f;
+  --color-brand-800: #8d2e13;
+  --color-brand-900: #742713;
+  --color-brand-950: #431105;
+  --color-brown-700: #805c4e;
+  --color-brown-800: #694c43;
+  --color-brown-900: #563f38;
+  --color-brown-950: #2d201d;
+  --color-sun-100: #fef4c7;
+  --color-sun-200: #fde57c;
+  --container-canvas: 1440px;
+  --ease-smooth: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --animate-marquee: marquee var(--dur, 60s) linear infinite;
+  --animate-swap: swap 0.5s var(--ease-smooth);
+}
+
+@keyframes ring {
+  0%,
+  to { transform: scale(1); }
+  50% { transform: scale(1.022); }
+}
+
+@keyframes marquee {
+  to { transform: translateX(calc(-1 * var(--dist, 0px))); }
+}
+
+@keyframes swap {
+  0% { opacity: 0.25; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.v3 {
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e6e6e6;
+  --color-neutral-300: #d3d3d3;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #535353;
+  --color-neutral-700: #404040;
+  --color-neutral-900: #1a1a1a;
+  --color-neutral-950: #0b0b0b;
+  --image-logo: url(/v3/images/logo.webp);
+  background: #fff;
+  color: var(--color-neutral-900);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  font-synthesis: none;
+}
+
+html:has(.v3) {
+  scroll-padding-top: 96px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.v3) {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Scroll reveal used across /v3 (V3Behaviors toggles .is-in). */
+.v3 [data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.7s var(--ease-smooth) var(--d, 0ms), transform 0.7s var(--ease-smooth) var(--d, 0ms);
+}
+
+.v3 [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3 [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+.glass-pill {
+  background: rgb(255 255 255 / 0.24);
+  backdrop-filter: blur(11.6px);
+}
+
+/* Pre-rendered noise tile. It replaced an inline SVG feTurbulence filter, which the GPU
+   re-rasterised every time a grainy section scrolled into view (a 120-200ms stall). */
+.hero-grain {
+  background-image: url("/grain.png");
+  background-size: 160px 160px;
+}
+
+.hero-progress {
+  animation-name: hero-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes hero-progress {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Pinned hero: content drifts up and the scene dims as the next section covers it. */
+.hero-content {
+  transform: translate3d(0, calc(var(--hero-p, 0) * -120px), 0);
+  opacity: calc(1 - var(--hero-p, 0) * 0.6);
+}
+
+.hero-drift {
+  transform: scale(calc(1 + var(--hero-p, 0) * 0.06));
+}
+
+.hero-dim {
+  opacity: calc(var(--hero-p, 0) * 0.45);
+}
+
+/* Iteration 2 hero: slow push-in on the background photo, standing in for a video loop. */
+.hero-v2-zoom {
+  animation: hero-v2-zoom 24s ease-in-out infinite alternate;
+}
+
+@keyframes hero-v2-zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-content,
+  .hero-drift {
+    transform: none;
+  }
+
+  .hero-v2-zoom {
+    animation: none;
+  }
+}
+
+.trust-progress {
+  animation-name: trust-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes trust-progress {
+  from { height: 0; }
+  to { height: 100%; }
+}
+
+/* Once the next section fully covers the pinned hero, stop painting it. */
+.hero[data-covered] {
+  visibility: hidden;
+}
+
+/* Below-the-fold sections skip layout and paint until they near the viewport. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+/* Closing CTA option B: the soft circles behind the wordmark drift slowly. */
+@media (prefers-reduced-motion: no-preference) {
+  .cta-orb {
+    animation: cta-orb 9s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes cta-orb {
+  to {
+    translate: 6% -8%;
+    scale: 1.08;
+  }
+}
+
+/* Scrollbars are hidden everywhere (the page and any inner scroll area) in every state, so locking
+   scroll (e.g. the preloader) never makes the layout jump sideways. Scrolling still works. */
+*,
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
