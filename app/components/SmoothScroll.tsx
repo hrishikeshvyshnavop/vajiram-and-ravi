@@ -10,7 +10,10 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 // GSAP ScrollSmoother around the page sections. Created in a layout effect so it exists
 // before the sections' own ScrollTriggers (plain effects) are set up. Fixed elements such as
 // the header must live outside this wrapper. Touch devices keep native scrolling.
-export default function SmoothScroll({ children }: { children: React.ReactNode }) {
+// `keepHash` (default true): in-page links write their #hash to the URL and arriving with a hash
+// jumps to it (e.g. /v1#cta). With keepHash={false} links scroll without touching the URL and any
+// hash and remembered scroll position are dropped on load, so a refresh starts at the top (used on /v5).
+export default function SmoothScroll({ children, keepHash = true }: { children: React.ReactNode; keepHash?: boolean }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +54,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       const target = link && targetOf(link.getAttribute("href")!);
       if (!target) return;
       e.preventDefault();
-      history.pushState(null, "", link.getAttribute("href"));
+      if (keepHash) history.pushState(null, "", link.getAttribute("href"));
       smoother.scrollTo(target, true, "top top");
     };
     const onHashChange = () => {
@@ -62,7 +65,13 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     window.addEventListener("hashchange", onHashChange);
     // Arriving with a hash: wait for fonts and the first re-measure, then jump without easing.
     let hashTimer: ReturnType<typeof setTimeout> | undefined;
-    if (location.hash) {
+    if (!keepHash) {
+      // Drop any hash and the browser's remembered position: a refresh starts at the top.
+      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      window.scrollTo(0, 0);
+      smoother.scrollTop(0);
+    } else if (location.hash) {
       document.fonts?.ready.then(() => {
         hashTimer = setTimeout(() => {
           const target = targetOf(location.hash);
@@ -79,7 +88,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       window.removeEventListener("hashchange", onHashChange);
       smoother.kill();
     };
-  }, []);
+  }, [keepHash]);
 
   return (
     <div ref={wrapperRef} id="smooth-wrapper">

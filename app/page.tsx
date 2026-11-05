@@ -9,6 +9,18 @@ type Route = { href: string; name: string; tag: string; summary: string };
 // route exists; move it to `archive` when it is no longer a candidate.
 const primary: Route[] = [
   {
+    href: "/v5",
+    name: "Your UPSC journey (bold Indian)",
+    tag: "Iteration 10",
+    summary: "Rust-and-saffron landing with Indian type and Hindi lines: the team's India collage reacts to the mouse, tilts and breaks into the GS syllabus on scroll; toppers, faculty, FAQ, lead form and a Parliament footer (after eathungrytiger.com).",
+  },
+  {
+    href: "/v4",
+    name: "Brand story (editorial)",
+    tag: "Iteration 9",
+    summary: "Loader counter, then a horizontal editorial scroll through the V&R story: Origin 1976, Method, Results 2025, Reach, Credits (after canals-amsterdam.com).",
+  },
+  {
     href: "/constitution-book",
     name: "Constitution book",
     tag: "Iteration 8",

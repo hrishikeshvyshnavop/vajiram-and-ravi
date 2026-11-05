@@ -1,0 +1,158 @@
+/* Iteration 10 (/v5): "The Recipe for Rank 1", after eathungrytiger.com. Their rust + saffron
+   packaging look is rebuilt from V&R colors: rust = brand-800, deep = brown-950, orange = brand-600,
+   saffron is taken from the V&R emblem's sun gradient (#ffd84f → #f89a1c). */
+
+.rs {
+  --rs-rust: var(--color-brand-800);
+  --rs-deep: var(--color-brown-950);
+  --rs-orange: var(--color-brand-600);
+  --rs-saffron: #fcb033;
+  --rs-cream: var(--color-brand-50);
+  --bw: min(21vw, 33vh);
+  --bd: calc(var(--bw) * 0.17);
+  --bh: calc(var(--bw) * 1.34);
+  background: var(--rs-rust);
+  color: var(--rs-saffron);
+  font-family: var(--rs-body), sans-serif;
+  font-weight: 500;
+}
+.rs ::selection { background: var(--rs-saffron); color: var(--rs-deep); }
+
+/* Headlines: Yatra One (Indian sign-painting letterforms). Single weight, so no faux bold. */
+.rs-display { font-family: var(--rs-head), var(--rs-display), sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: 0; line-height: 0.92; }
+.rs-hi { font-family: var(--rs-head), sans-serif; font-weight: 400; line-height: 1.3; }
+.rs-small { font-family: var(--rs-display), sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; font-size: 13px; line-height: 1.15; }
+
+/* Dotted rules, as on the original header and hero. */
+.rs-dots { height: 3px; background-image: radial-gradient(circle, var(--rs-saffron) 1.2px, transparent 1.6px); background-size: 9px 3px; background-repeat: repeat-x; }
+.rs-dots-v { width: 3px; background-image: radial-gradient(circle, currentColor 1.2px, transparent 1.6px); background-size: 3px 9px; background-repeat: repeat-y; }
+
+/* Pills */
+.rs-pill { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 18px; border-radius: 999px; background: var(--rs-saffron); color: var(--rs-deep); font-family: var(--rs-display), sans-serif; font-weight: 700; text-transform: uppercase; font-size: 13px; letter-spacing: 0.01em; transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms; }
+.rs-pill:hover { transform: scale(1.06) rotate(-2deg); }
+.rs-pill:focus-visible { outline: 2px solid var(--rs-cream); outline-offset: 3px; }
+.rs-tag { display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: 999px; background: var(--rs-rust); color: var(--rs-saffron); font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 11px; text-transform: uppercase; }
+
+/* Paper grain over every colored surface. */
+/* Grain sits between the surface color and its content (isolated stacking context, z-index -1). */
+.rs-grain { isolation: isolate; }
+.rs-grain::before { content: ""; position: absolute; inset: 0; z-index: -1; background: url(/grain.png) repeat; background-size: 240px; mix-blend-mode: multiply; opacity: 0.22; pointer-events: none; }
+
+/* ---------- the study kit (3D book), stands in for the sauce jar ---------- */
+.rs-book-wrap { perspective: 1600px; }
+.rs-float { animation: rs-float 5s ease-in-out infinite; transform-style: preserve-3d; }
+@keyframes rs-float { 50% { transform: translateY(-14px) rotateZ(1.5deg); } }
+.rs-book { position: relative; width: var(--bw); height: var(--bh); transform-style: preserve-3d; will-change: transform; }
+.rs-face { position: absolute; backface-visibility: hidden; overflow: hidden; }
+/* Vintage cloth-bound book. Cloth = oxblood (near brand-950) with a fine weave, scuffed edges,
+   foxing and a vignette; type and ornaments are worn gold foil; page block is yellowed paper. */
+.rs-front, .rs-back { inset: 0; border-radius: 3px 7px 7px 3px; }
+.rs-front { transform: translateZ(calc(var(--bd) / 2)); }
+.rs-back { transform: rotateY(180deg) translateZ(calc(var(--bd) / 2)); border-radius: 7px 3px 3px 7px; }
+.rs-cloth {
+  background-color: #4a1710;
+  background-image:
+    radial-gradient(ellipse at 18% 12%, rgba(255, 214, 170, 0.10), transparent 40%),
+    radial-gradient(circle at 78% 70%, rgba(20, 6, 2, 0.35), transparent 35%),
+    radial-gradient(circle at 30% 82%, rgba(150, 90, 40, 0.18) 0 2%, transparent 3%),
+    radial-gradient(circle at 70% 22%, rgba(150, 90, 40, 0.14) 0 1.5%, transparent 2.5%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.09) 0 1px, transparent 1px 3px),
+    linear-gradient(160deg, #5a1d12, #3a110b);
+  box-shadow: inset 0 0 calc(var(--bw) * 0.09) rgba(10, 2, 0, 0.75), inset 0 0 0 1px rgba(255, 220, 180, 0.08);
+}
+/* Scuffs, worn foil and edge rub on top of everything on the face. */
+.rs-wear { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: 0.32; background: url(/grain.png) repeat; background-size: 180px; }
+.rs-wear::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(255, 210, 160, 0.35), transparent 14%),
+    radial-gradient(ellipse at 100% 100%, rgba(255, 210, 160, 0.3), transparent 14%),
+    linear-gradient(90deg, transparent 96%, rgba(255, 210, 160, 0.25)),
+    linear-gradient(0deg, rgba(255, 210, 160, 0.18), transparent 4%);
+  mix-blend-mode: screen;
+}
+/* Gold foil: metallic gradient clipped to the text, slightly debossed. */
+.rs-gold {
+  background: linear-gradient(115deg, #7a531a 0%, #d9b25c 28%, #f6e2a1 42%, #c3913a 58%, #8a6224 78%, #d6ad58 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.55)) drop-shadow(0 -0.5px 0 rgba(255, 230, 170, 0.15));
+}
+.rs-gold-stroke { color: #c9a04c; filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.6)); opacity: 0.9; }
+.rs-gold-rule { display: block; width: 62%; height: 3px; border-top: 1px solid #c9a04c; border-bottom: 1px solid #c9a04c; opacity: 0.85; }
+.rs-frame { border: 1px solid rgba(201, 160, 76, 0.85); outline: 1px solid rgba(201, 160, 76, 0.55); outline-offset: calc(var(--bw) * -0.025); box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 220, 170, 0.08); }
+/* Leather corner caps on the fore-edge. */
+.rs-corner { position: absolute; right: 0; width: 17%; aspect-ratio: 1; background: linear-gradient(135deg, #2a0c06, #1c0703); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.8); }
+.rs-corner-tr { top: 0; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.rs-corner-br { bottom: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+/* Aged paper label (back cover). */
+.rs-paper {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(140, 90, 30, 0.16) 0 3%, transparent 5%),
+    radial-gradient(circle at 75% 80%, rgba(140, 90, 30, 0.14) 0 4%, transparent 6%),
+    radial-gradient(ellipse at center, #efe1bf 40%, #d9c18d 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 0 calc(var(--bw) * 0.05) rgba(120, 80, 30, 0.45);
+}
+/* Spine: rounded leather (lit across its curve) with raised bands. */
+.rs-spine, .rs-edge { top: 0; height: 100%; width: var(--bd); left: calc(50% - var(--bd) / 2); }
+.rs-spine {
+  transform: rotateY(-90deg) translateZ(calc(var(--bw) / 2));
+  background: linear-gradient(90deg, #1e0704 0%, #4a1710 22%, #6b2618 48%, #4a1710 74%, #1e0704 100%);
+}
+.rs-band { display: block; width: 100%; height: 3.2%; background: linear-gradient(180deg, #1a0503, #7a3020 45%, #2a0c06); box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5); }
+.rs-spine-title { padding: 0.4em 0.15em; border: 1px solid rgba(201, 160, 76, 0.6); }
+/* Page block: yellowed, uneven paper, darker toward the ends. */
+.rs-edge {
+  transform: rotateY(90deg) translateZ(calc(var(--bw) / 2 - 3px));
+  background:
+    linear-gradient(180deg, rgba(110, 70, 25, 0.45), transparent 12%, transparent 88%, rgba(110, 70, 25, 0.45)),
+    repeating-linear-gradient(90deg, #e9d8b0 0 1px, #cdb282 1px 2px, #e2cfa2 2px 3px);
+}
+.rs-top, .rs-bottom {
+  left: 0; width: calc(100% - 3px); height: var(--bd); top: calc(50% - var(--bd) / 2);
+  background:
+    linear-gradient(90deg, rgba(110, 70, 25, 0.4), transparent 15%, transparent 85%, rgba(110, 70, 25, 0.35)),
+    repeating-linear-gradient(0deg, #e9d8b0 0 1px, #cdb282 1px 2px, #e2cfa2 2px 3px);
+}
+.rs-top { transform: rotateX(90deg) translateZ(calc(var(--bh) / 2)); }
+.rs-bottom { transform: rotateX(-90deg) translateZ(calc(var(--bh) / 2)); }
+.rs-shadow { position: absolute; left: 50%; bottom: -8%; width: 120%; height: 10%; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(25, 8, 2, 0.55), transparent); filter: blur(6px); }
+
+/* Chips that pop around the book in "What's inside". */
+.rs-chip { position: absolute; transform: scale(0); white-space: nowrap; }
+
+/* Marquee */
+.rs-marquee { display: flex; width: max-content; animation: rs-marquee 28s linear infinite; }
+@keyframes rs-marquee { to { transform: translateX(-50%); } }
+
+/* Word-by-word fill on scroll ("Just a plan in every class"). */
+.rs-fill-word { opacity: 0.25; }
+
+/* Programme facts label (their nutrition label). */
+.rs-label { background: var(--rs-cream); color: var(--rs-deep); }
+.rs-label-row { display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid rgba(45, 32, 29, 0.35); padding: 7px 0; font-size: 14px; }
+.rs-label-row.thick { border-top-width: 8px; border-top-color: var(--rs-deep); }
+.rs-label-row.mid { border-top-width: 4px; border-top-color: var(--rs-deep); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rs-float, .rs-marquee { animation: none; }
+  .rs-chip { transform: none; }
+  .rs-fill-word { opacity: 1; }
+}
+
+/* Footer links: cream at rest, saffron with a sliding underline on hover/focus. */
+.rs-flink { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: color 200ms, background-size 300ms; }
+.rs-flink:hover, .rs-flink:focus-visible { color: var(--rs-saffron); background-size: 100% 1px; outline: none; }
+
+/* ---------- hero collage (by the V&R team, vr-homepage-v25) in place of the jar ---------- */
+.rs-collage-wrap { width: min(60vw, 95vh); perspective: 1400px; }
+.rs-collage { position: relative; aspect-ratio: 1536 / 952; transform-style: preserve-3d; will-change: transform; }
+.rs-layer { position: absolute; transform-style: preserve-3d; will-change: transform; }
+/* The backdrop was cut for an orange page; fade its edges (and its white foot) into our rust. */
+.rs-layer-bg img { -webkit-mask-image: radial-gradient(ellipse 50% 50% at 57% 55%, #000 38%, transparent 96%); mask-image: radial-gradient(ellipse 50% 50% at 57% 55%, #000 38%, transparent 96%); }
+.rs-layer-front img { -webkit-mask-image: linear-gradient(#000 62%, transparent 96%); mask-image: linear-gradient(#000 62%, transparent 96%); }
+.rs-layer img { filter: drop-shadow(0 18px 24px rgba(20, 6, 2, 0.35)); }
+.rs-layer-bg img, .rs-layer-front img { filter: none; }
+/* Syllabus tags shown when the collage explodes. */
+.rs-tag-pop { position: absolute; z-index: 5; translate: -50% -50%; transform: scale(0); backface-visibility: hidden; opacity: 0; white-space: nowrap; height: 34px !important; padding: 0 14px !important; font-size: 12px !important; box-shadow: 0 8px 20px -6px rgba(20, 6, 2, 0.6); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .rs-tag-pop { transform: none; opacity: 1; } }

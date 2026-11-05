@@ -5,6 +5,8 @@ homepage iteration with a live preview; each iteration is its own route.
 
 | Route | What it is |
 | --- | --- |
+| `/v5` | Your UPSC journey, bold Indian landing (Iteration 10, after eathungrytiger.com) — primary |
+| `/v4` | Brand story, horizontal editorial scroll (Iteration 9, after canals-amsterdam.com) — primary |
 | `/constitution-book` | Constitution book (Iteration 8) — primary |
 | `/v1` | Slider hero (Iteration 1) — primary |
 | `/hero-parliament` | Parliament scroll story (Iteration 5) — primary |
@@ -15,7 +17,7 @@ homepage iteration with a live preview; each iteration is its own route.
 
 ```
 app/              routes (one folder per iteration) + shared components in app/components
-public/           images, brand assets, thumbnails (v3 images under public/v3)
+public/           images, brand assets, thumbnails (v3 images under public/v3; v5 collage, newsprint and footer art under public/v5)
 scripts/          dev-only helpers (thumbnail capture, v3 HTML→JSX sync); not part of the build
 next.config.ts    images, Turbopack CSS loader, cache components
 ```

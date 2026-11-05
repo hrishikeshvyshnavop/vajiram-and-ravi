@@ -1,0 +1,136 @@
+/* Iteration 9 (/v4): Vajiram & Ravi brand story in the CANALS editorial style.
+   Sizes follow CANALS, which sizes everything off the viewport height (e.g. paragraphs 5.09vh,
+   the loader counter 18.49vw). --u is 1vh on landscape screens and shrinks on narrow ones so the
+   horizontal layout still fits a phone. Colors are the V&R brand tokens from globals.css. */
+
+.bs {
+  --u: min(1vh, 1.15vw);
+  --rail: max(48px, 4.1667vw);
+  --bs-brand: var(--color-brand-600);
+  --bs-brand-soft: var(--color-brand-500);
+  --bs-paper: var(--color-brand-50);
+  --bs-ink: var(--color-brown-950);
+  --bs-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  background: var(--bs-ink);
+  color: var(--bs-ink);
+  font-family: var(--bs-sans), sans-serif;
+}
+
+.bs ::selection { background: var(--bs-ink); color: var(--bs-paper); }
+
+/* ---------- type ---------- */
+.bs-serif { font-family: var(--bs-serif), serif; font-size: calc(var(--u) * 5.09); line-height: 1; letter-spacing: 0.005em; }
+.bs-serif-sm { font-family: var(--bs-serif), serif; font-size: calc(var(--u) * 2.6); line-height: 1.2; }
+.bs-indent { text-indent: calc(var(--u) * 2.7); }
+.bs-cas { font-family: var(--bs-caslon), serif; font-size: calc(var(--u) * 29.07); line-height: calc(var(--u) * 23.6); letter-spacing: -0.02em; }
+.bs-huge { font-family: var(--bs-caslon), serif; font-size: calc(var(--u) * 76); line-height: 0.78; letter-spacing: -0.04em; }
+.bs-wide { font-family: var(--bs-wide), sans-serif; font-weight: 800; font-stretch: 125%; letter-spacing: 0.04em; text-transform: uppercase; }
+.bs-label { font-family: var(--bs-wide), sans-serif; font-weight: 700; font-stretch: 125%; font-size: calc(var(--u) * 1.48); letter-spacing: 0.16em; text-transform: uppercase; }
+
+/* CANALS "cap": a three-line caption. Line 1 letter-spaced caps, line 2 italic, line 3 dimmed. */
+.bs-cap { font-size: calc(var(--u) * 1.85); line-height: 1.35; letter-spacing: 0.026em; }
+.bs-cap > div { overflow: hidden; }
+.bs-cap > div:nth-child(1) { font-family: var(--bs-wide), sans-serif; font-weight: 700; font-stretch: 125%; font-size: calc(var(--u) * 1.48); letter-spacing: 0.16em; text-transform: uppercase; }
+.bs-cap > div:nth-child(2) { font-style: italic; }
+.bs-cap > div:nth-child(3) { opacity: 0.6; }
+
+/* Line masks: the inner span starts below its clipped wrapper and slides up. */
+.bs-mask { display: block; overflow: hidden; }
+.bs-mask > span { display: block; transform: translate3d(0, 102%, 0); will-change: transform; }
+.bs-cap > div > span { display: block; transform: translate3d(0, 102%, 0); will-change: transform; }
+
+/* ---------- loader ---------- */
+.bs-loader { position: fixed; inset: 0; z-index: 60; background: var(--bs-ink); color: var(--bs-paper); pointer-events: none; will-change: transform; }
+.bs-loader-no { position: absolute; left: 8.333vw; top: calc(5.05vh - 1.17vw); overflow: hidden; color: var(--bs-brand-soft); font-size: 18.49vw; line-height: 15.6vw; padding-top: 0.6vw; }
+.bs-loader-no > span { display: block; transform: translate3d(0, 102%, 0); font-variant-numeric: tabular-nums; }
+.bs-loader-line { position: absolute; left: 8.333vw; bottom: calc(var(--u) * 5); overflow: hidden; }
+.bs-loader-line > span { display: block; transform: translate3d(0, 102%, 0); }
+
+/* ---------- left rail (CANALS #nav) ---------- */
+.bs-rail { position: fixed; top: 0; bottom: 0; left: 0; z-index: 50; width: var(--rail); color: var(--rail-fg); --rail-fg: #fff; --rail-line: rgba(255, 255, 255, 0.19); user-select: none; }
+.bs-rail-bg { position: absolute; inset: 0; background: var(--rail-bg, var(--bs-brand)); border-right: 1px solid var(--rail-line); transition: background-color 600ms var(--bs-ease), border-color 600ms var(--bs-ease); }
+.bs-rail[data-theme="brand"] { --rail-bg: var(--bs-brand); --rail-fg: #fff; --rail-line: rgba(0, 0, 0, 0.19); }
+.bs-rail[data-theme="dark"] { --rail-bg: var(--bs-ink); --rail-fg: #fff; --rail-line: rgba(255, 255, 255, 0.19); }
+.bs-rail[data-theme="paper"] { --rail-bg: var(--bs-paper); --rail-fg: var(--bs-ink); --rail-line: rgba(0, 0, 0, 0.19); }
+.bs-rail[data-theme="white"] { --rail-bg: #fff; --rail-fg: var(--bs-ink); --rail-line: rgba(0, 0, 0, 0.19); }
+.bs-rail[data-theme="image"] { --rail-bg: transparent; --rail-fg: #fff; --rail-line: rgba(255, 255, 255, 0.19); }
+.bs-rail, .bs-rail * { transition-property: color, background-color, border-color, opacity, transform; transition-duration: 600ms; transition-timing-function: var(--bs-ease); }
+
+.bs-burger { position: absolute; top: 0; left: 0; width: calc(100% - 1px); height: 12.22vh; display: flex; align-items: center; justify-content: center; cursor: pointer; border-bottom: 1px solid var(--rail-line); background: none; color: inherit; }
+.bs-burger span { display: block; width: 36%; height: 1.5px; background: currentColor; }
+.bs-burger span + span { margin-top: 5px; }
+.bs-burger-lines { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.bs-burger[aria-expanded="true"] .bs-burger-lines span:first-child { transform: translateY(3.25px) rotate(45deg); }
+.bs-burger[aria-expanded="true"] .bs-burger-lines span:last-child { transform: translateY(-3.25px) rotate(-45deg); }
+.bs-burger:focus-visible, .bs-menu a:focus-visible, .bs-menu button:focus-visible, .bs-link:focus-visible { outline: 2px solid currentColor; outline-offset: -4px; }
+
+.bs-prog-w { position: absolute; top: 12.22vh; bottom: 0; left: 0; width: 0.16vw; min-width: 2px; overflow: hidden; }
+.bs-prog { position: absolute; inset: 0; background: currentColor; transform-origin: 50% 0; transform: scaleY(0); transition: none !important; }
+
+.bs-vert { position: absolute; top: 12.22vh; left: var(--rail); width: calc(100vh - 12.22vh - 12vh); height: var(--rail); transform-origin: 0 0; transform: rotate(90deg); display: flex; align-items: center; justify-content: space-between; padding: 0 calc(var(--u) * 3.6); white-space: nowrap; }
+.bs-vert-title { font-size: calc(var(--u) * 1.48); }
+.bs-vert-count { font-family: var(--bs-sans), sans-serif; font-size: calc(var(--u) * 1.48); letter-spacing: 0.08em; font-variant-numeric: tabular-nums; opacity: 0.7; }
+
+.bs-emblem { position: absolute; bottom: calc(var(--u) * 4.8); left: 50%; width: 46%; transform: translateX(-50%); }
+
+/* ---------- menu (slides out from the rail) ---------- */
+.bs-menu { position: fixed; top: 0; bottom: 0; left: calc(var(--rail) - 1px); right: 0; z-index: 45; overflow: hidden; pointer-events: none; visibility: hidden; }
+.bs-menu[data-open="true"] { pointer-events: auto; visibility: visible; }
+.bs-menu-bg { position: absolute; inset: 0; background: var(--bs-brand); transform: translate3d(-101%, 0, 0); transition: transform 1100ms var(--bs-ease); box-shadow: 10px 0 20px 0 rgba(0, 0, 0, 0.15); }
+.bs-menu[data-open="true"] .bs-menu-bg { transform: none; }
+.bs-menu-list { position: relative; padding: 14vh 0 0 calc(var(--u) * 14.8); color: #fff; }
+.bs-menu-li { overflow: hidden; }
+.bs-menu-li button { display: flex; align-items: baseline; gap: calc(var(--u) * 3); padding: calc(var(--u) * 0.9) 0; background: none; color: inherit; cursor: pointer; text-align: left; transform: translate3d(0, 102%, 0); transition: transform 900ms var(--bs-ease), opacity 400ms; }
+.bs-menu[data-open="true"] .bs-menu-li button { transform: none; }
+.bs-menu-li:nth-child(2) button { transition-delay: 60ms; }
+.bs-menu-li:nth-child(3) button { transition-delay: 120ms; }
+.bs-menu-li:nth-child(4) button { transition-delay: 180ms; }
+.bs-menu-li:nth-child(5) button { transition-delay: 240ms; }
+.bs-menu-li:nth-child(6) button { transition-delay: 300ms; }
+.bs-menu-li:nth-child(7) button { transition-delay: 360ms; }
+.bs-menu-no { width: calc(var(--u) * 9); font-family: var(--bs-sans), sans-serif; font-size: calc(var(--u) * 1.85); letter-spacing: 0.08em; opacity: 0.7; }
+.bs-menu-title { font-family: var(--bs-serif), serif; font-size: calc(var(--u) * 7.4); line-height: 1; }
+.bs-menu-li button:hover .bs-menu-title { font-style: italic; }
+.bs-menu-foot { position: absolute; left: calc(var(--u) * 14.8); bottom: calc(var(--u) * 4.8); color: #fff; opacity: 0; transition: opacity 600ms 400ms; }
+.bs-menu[data-open="true"] .bs-menu-foot { opacity: 0.7; }
+
+/* ---------- horizontal track ---------- */
+.bs-pin { position: relative; height: 100vh; overflow: hidden; }
+.bs-track { display: flex; height: 100%; width: max-content; padding-left: var(--rail); will-change: transform; }
+.bs-panel { position: relative; flex: none; height: 100%; }
+.bs-panel[data-theme="brand"] { background: var(--bs-brand); color: #fff; }
+.bs-panel[data-theme="dark"] { background: var(--bs-ink); color: var(--bs-paper); }
+.bs-panel[data-theme="paper"] { background: var(--bs-paper); color: var(--bs-ink); }
+.bs-panel[data-theme="white"] { background: #fff; color: var(--bs-ink); }
+.bs-panel[data-theme="image"] { background: var(--bs-ink); color: #fff; }
+
+/* A hairline that divides parts of a panel, drawn top to bottom. */
+.bs-vline { position: absolute; top: 0; bottom: 0; width: 1px; background: currentColor; opacity: 0.35; transform-origin: 50% 0; transform: scaleY(0); }
+
+/* Circles (CANALS .cir): numbers in Coign, here Anton. */
+.bs-cir { flex: none; width: calc(var(--u) * 19.5); height: calc(var(--u) * 19.5); border-radius: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--bs-cond), sans-serif; font-size: calc(var(--u) * 9.5); line-height: 1; transform: scale(0); }
+.bs-cir-brand { background: var(--bs-brand); color: #fff; }
+.bs-cir-ink { background: var(--bs-ink); color: #fff; }
+.bs-cir-paper { background: var(--bs-paper); color: var(--bs-ink); }
+.bs-cir-line { border: 1px solid currentColor; }
+
+/* ---------- photos: brand duotone + paper grain ---------- */
+.bs-photo { position: relative; overflow: hidden; background: var(--bs-ink); }
+.bs-photo-full { position: absolute; inset: 0; }
+.bs-photo-in { position: absolute; top: 0; bottom: 0; left: -8%; right: -8%; will-change: transform; }
+.bs-photo img { filter: url(#bs-duotone); object-fit: cover; }
+.bs-photo::after { content: ""; position: absolute; inset: 0; background: url(/grain.png) repeat; background-size: 220px; mix-blend-mode: multiply; opacity: 0.2; pointer-events: none; }
+.bs-photo-cap { position: absolute; z-index: 1; left: calc(var(--u) * 7.4); bottom: calc(var(--u) * 4.8); color: #fff; }
+
+/* SVG lines drawn on scroll. pathLength="1" on each path. */
+.bs-draw { fill: none; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; }
+
+.bs-link { position: relative; display: inline-block; }
+.bs-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -0.08em; border-bottom: 1px solid currentColor; transform-origin: 0 50%; transition: transform 1000ms var(--bs-ease); }
+.bs-link:hover::after { transform: scaleX(0); transform-origin: 100% 50%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bs-mask > span, .bs-cap > div > span, .bs-loader-no > span, .bs-loader-line > span, .bs-cir, .bs-vline { transform: none !important; }
+  .bs-draw { stroke-dashoffset: 0; }
+  .bs-menu-bg, .bs-menu-li button { transition-duration: 1ms; }
+}
