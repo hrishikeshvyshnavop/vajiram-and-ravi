@@ -1,0 +1,235 @@
+import Image from "next/image";
+import Btn from "./RecipeButton";
+
+// "Meet the toppers" as a modern newspaper front page (user request 2026-11-06; modern look and layout 2026-11-07, after the front page
+// of The South India Times, Hyderabad edition, that the user shared): a full-width bold serif masthead under a meta line, a red call bar,
+// a strip of three colour teaser tiles, then a dense grid: a narrow "Short takes" side column (AIR 4 to 10), the lead story (AIR 1, big
+// serif headline, photo, text in columns, a highlighted box with red bullets), a second story in a right column (AIR 2), and a row of
+// three stories (AIR 3, admissions, numbers) with mixed headline styles, thin rules between rows, "In brief" and print colour marks.
+// Facts only from the toppers list and site copy. Motion (wired in RecipeStory's effect): the sheet settles from a tilt as it scrolls in
+// ([data-paper], desktop only); nothing inside the sheet is revealed or faded in (user 2026-11-07: no reveal animation on the text).
+// Earlier layouts are in apps/my-app/backup/removed-sections/RecipeToppersPaper.vintage.tsx.bak (the aged broadsheet).
+
+export type Topper = { air: number; name: string; img: string; took: readonly string[] };
+
+const igpCount = (list: readonly Topper[]) => list.filter((t) => t.took.some((p) => /IGP|Interview Guidance/.test(p))).length;
+
+const photo = (t: Topper) => `/v3/images/toppers-bw/${t.img}.webp`;
+
+export default function RecipeToppersPaper({ toppers }: { toppers: readonly Topper[] }) {
+  const [air1, air2, air3] = toppers;
+  const rest = toppers.slice(3);
+  const igp = igpCount(toppers);
+
+  return (
+    <section
+      id="toppers"
+      // Transparent: the paper is blown in over the held hero (see RecipeStory), so only the sheet covers it.
+      // z-[1] keeps it above the pinned hero.
+      className="relative z-[1] px-4 pt-6 pb-24 [overflow:clip_visible] sm:px-7 sm:pt-10 sm:pb-28"
+      // overflow clip on x only: the flying sheet goes above the section's top edge while it arrives
+    >
+      {/* Rust backdrop that fades in as the paper lands (RecipeStory), so the near-black held hero never shows around or below the sheet. */}
+      <span data-toppers-bg="" className="rs-toppers-bg" aria-hidden />
+      {/* Outer wrapper takes the scroll rise (GSAP); the sheet inside is static (no wind sway, for performance). */}
+      <div data-paper="" className="relative mx-auto max-w-[1320px]">
+      <div className="rs-paper-sheet rs-fp relative px-4 pt-5 pb-8 sm:px-8 sm:pt-6 sm:pb-10">
+        {/* ---------- masthead ---------- */}
+        <header>
+          <div className="rs-fp-meta">
+            <span>Vol. L · Result special</span>
+            <span className="hidden sm:inline">Estd. 1976 · New Delhi · Chennai · Online</span>
+            <span>UPSC CSE 2025 · All India Ranks 1 to 10</span>
+          </div>
+          <h2 className="rs-fp-mast">The Aspirant&apos;s Chronicle</h2>
+          <p className="rs-fp-tag">
+            <i>Where the toppers prepared</i>
+            <span lang="hi" className="rs-hi">अभ्यर्थी समाचार · सिविल सेवा परिणाम विशेषांक</span>
+          </p>
+          <div className="rs-fp-bar">
+            <span>Admissions open for 2027</span>
+            <span className="hidden sm:inline">Call <a href="tel:+918062206330">080-6220-6330</a> · Mon – Sat, 9 AM – 7 PM</span>
+            <a href="#enrol">Book a free counselling call →</a>
+          </div>
+        </header>
+
+        {/* ---------- teaser tiles ---------- */}
+        <div className="rs-fp-tiles">
+          <a href="#fp-lead" className="rs-fp-tile is-paper">
+            <small>Result · CSE 2025</small>
+            <b>All ten of the top ten ranks prepared with V&amp;R</b>
+          </a>
+          <a href="#fp-air2" className="rs-fp-tile is-rust">
+            <small>Interview board</small>
+            <b>{igp} of the ten took the Interview Guidance Programme</b>
+          </a>
+          <a href="#enrol" className="rs-fp-tile is-saffron">
+            <small>Admissions · 2027</small>
+            <b>Talk to a counsellor, free of charge</b>
+          </a>
+        </div>
+
+        <div className="rs-fp-grid">
+          {/* ---------- side column: the rest of the top ten ---------- */}
+          <aside className="rs-fp-side" aria-label="The rest of the top ten, AIR 4 to 10">
+            <div className="rs-fp-info">
+              <b>Admissions 2027</b>
+              <span>Classroom &amp; LIVE online</span>
+              <span>English and <span lang="hi">हिंदी</span></span>
+              <span>New Delhi · Chennai</span>
+            </div>
+            <p className="rs-fp-label">Short <span>Takes</span></p>
+            <ul className="rs-fp-shorts">
+              {rest.map((t) => (
+                <li key={t.air}>
+                  <div className="rs-fp-short-photo">
+                    <Image src={photo(t)} alt={`${t.name}, AIR ${t.air} in CSE 2025`} fill sizes="(min-width: 1024px) 160px, 40vw" className="object-cover object-top" />
+                  </div>
+                  <h4>AIR {t.air}: {t.name}</h4>
+                  <p>{t.took.join(" · ")}</p>
+                </li>
+              ))}
+            </ul>
+          </aside>
+
+          {/* ---------- main: lead + second story, then a row of three ---------- */}
+          <div className="rs-fp-main">
+            <div className="rs-fp-top">
+              <article id="fp-lead" className="rs-fp-lead">
+                <h3>Nine of the top ten trained for the interview board at V&amp;R</h3>
+                <figure>
+                  <div className="rs-fp-lead-photo">
+                    <Image src={photo(air1)} alt={`${air1.name}, AIR 1 in CSE 2025`} fill sizes="(min-width: 1024px) 48vw, 92vw" className="object-cover object-top" priority />
+                    <span className="rs-paper-badge" role="img" aria-label="All India Rank 1">AIR<b>1</b></span>
+                  </div>
+                  <figcaption className="rs-paper-caption">
+                    <b>{air1.name}</b>, All India Rank 1, CSE 2025. Prepared with the {air1.took.join(", ")}.
+                  </figcaption>
+                </figure>
+                <p className="rs-fp-dateline">NEW DELHI, V&amp;R BUREAU:</p>
+                <div className="rs-fp-cols">
+                  <p>
+                    The final result of the UPSC Civil Services Examination 2025 places all ten of the top All India Ranks with aspirants who prepared at Vajiram &amp; Ravi.
+                  </p>
+                  <p>
+                    {air1.name} heads the list at AIR 1, having prepared for the Personality Test with the institute&apos;s Interview Guidance Programme (IGP).
+                  </p>
+                  <p>
+                    {igp} of the ten went through IGP before facing the board. {air3?.name}, AIR 3, came through the classroom GS Prelims cum Mains programme.
+                  </p>
+                  <p>Their programmes ranged from the PowerUp Prelims and Mains test series to Sociology optional coaching and the GS Ethics module.</p>
+                </div>
+                <ul className="rs-fp-hilite">
+                  <li>All ten of the top ten All India Ranks prepared with Vajiram &amp; Ravi.</li>
+                  <li>{igp} of the ten took the Interview Guidance Programme before the board.</li>
+                  <li>Preparing aspirants since 1976, in English and Hindi.</li>
+                  <li>Admissions are open for 2027, in New Delhi, Chennai and online.</li>
+                </ul>
+              </article>
+
+              <article id="fp-air2" className="rs-fp-second">
+                <h3>{air2.name} takes AIR 2</h3>
+                <figure>
+                  <div className="rs-fp-second-photo">
+                    <Image src={photo(air2)} alt={`${air2.name}, AIR 2 in CSE 2025`} fill sizes="(min-width: 1024px) 26vw, 92vw" className="object-cover object-top" />
+                    <span className="rs-paper-badge is-sm" role="img" aria-label="All India Rank 2">AIR<b>2</b></span>
+                  </div>
+                  <figcaption className="rs-paper-caption">
+                    <b>{air2.name}</b>, All India Rank 2, CSE 2025.
+                  </figcaption>
+                </figure>
+                <p className="rs-fp-dateline">NEW DELHI (V&amp;R):</p>
+                <p className="rs-fp-text">
+                  {air2.name} placed second in the Civil Services Examination 2025, prepared with the {air2.took.join(", ")}. Together with {air1.name} at AIR 1, the top two ranks both came from Vajiram &amp; Ravi.
+                </p>
+              </article>
+            </div>
+
+            <div className="rs-fp-row">
+              <article className="rs-fp-story is-sans">
+                <h3>{air3?.name} at AIR 3, from the classroom</h3>
+                {air3 && (
+                  <div className="rs-fp-story-photo">
+                    <Image src={photo(air3)} alt={`${air3.name}, AIR 3 in CSE 2025`} fill sizes="(min-width: 1024px) 24vw, 92vw" className="object-cover object-top" />
+                    <span className="rs-paper-badge is-sm" role="img" aria-label="All India Rank 3">AIR<b>3</b></span>
+                  </div>
+                )}
+                <p className="rs-fp-dateline">NEW DELHI (V&amp;R):</p>
+                <p className="rs-fp-text">
+                  {air3?.name}, AIR 3, came through the classroom GS Prelims cum Mains programme. Prepared with the {air3?.took.join(", ")}.
+                </p>
+              </article>
+
+              <article className="rs-fp-story is-light">
+                <h3>Admissions open for 2027</h3>
+                <p className="rs-fp-dateline">CLASSIFIED · ADMISSIONS:</p>
+                <p className="rs-fp-text">Classroom &amp; online GS Prelims cum Mains. English and Hindi medium. New Delhi · Chennai.</p>
+                <p className="rs-fp-text">A counsellor will call you back at the time you choose, map your stage and help you pick the programme.</p>
+                <Btn href="#enrol" variant="ink" className="mt-3">Book a free counselling call</Btn>
+              </article>
+
+              <article className="rs-fp-story is-nums">
+                <h3>In numbers</h3>
+                <dl>
+                  <div>
+                    <dt>10/10</dt>
+                    <dd>of the top ten All India Ranks prepared with V&amp;R</dd>
+                  </div>
+                  <div>
+                    <dt>{igp}</dt>
+                    <dd>of the ten took the Interview Guidance Programme</dd>
+                  </div>
+                  <div>
+                    <dt>1976</dt>
+                    <dd>the year Vajiram &amp; Ravi began preparing aspirants</dd>
+                  </div>
+                </dl>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        {/* ---------- in brief: four short items, facts only (domain overview / site copy) ---------- */}
+        <div className="rs-fp-sec">
+          <p className="rs-fp-label is-wide">In <span>Brief</span></p>
+          <span lang="hi" className="rs-hi">संक्षेप में</span>
+        </div>
+        <ol className="rs-fp-brief">
+          <li>
+            <h4>One exam, three stages</h4>
+            <p>The UPSC Civil Services Examination is taken in three stages: the objective Prelims, the written Mains and the Interview, the Personality Test. One preparation serves the IAS, IPS, IFS and every other Civil Service.</p>
+          </li>
+          <li>
+            <h4>Classes in Hindi as well</h4>
+            <p>Vajiram &amp; Ravi teaches in English and Hindi, with Hindi-medium mentorship and a Mains Test Series in Hindi.</p>
+          </li>
+          <li>
+            <h4>Two centres, and online</h4>
+            <p>Classrooms in New Delhi, on Pusa Road in Old Rajinder Nagar, and in Chennai. Live online and recorded classes carry the same faculty and plan to aspirants anywhere.</p>
+          </li>
+          <li>
+            <h4>Optional subjects covered</h4>
+            <p>Optional coaching runs for 20 to 30 weeks in subjects including Geography, History, Sociology, Psychology, Economics and Political Science, with an Optional Test Series alongside.</p>
+          </li>
+        </ol>
+
+        <div className="rs-fp-end">
+          <p className="rs-paper-by">
+            Continued on page 2: <i>your name.</i>
+          </p>
+          <Btn href="#enrol" variant="ink">Admissions for 2027 are open</Btn>
+        </div>
+        {/* print colour marks along the foot, as on a printed front page */}
+        <div className="rs-fp-marks" aria-hidden>
+          <i style={{ background: "#00aeef" }} /><i style={{ background: "#ec008c" }} /><i style={{ background: "#fff200" }} /><i style={{ background: "#111" }} />
+          <i className="is-g" /><i className="is-g2" /><i className="is-g" /><i className="is-g2" />
+          <i style={{ background: "#00aeef" }} /><i style={{ background: "#ec008c" }} /><i style={{ background: "#fff200" }} /><i style={{ background: "#111" }} />
+        </div>
+        {/* darkens the paper (only the sheet, so nothing around it goes black) while the team sweeps in; opacity 0 unless driven */}
+        <span className="rs-paper-veil" aria-hidden />
+        <p className="rs-paper-imprint mt-5 text-center">Published by Vajiram &amp; Ravi · 1-B/7, Pusa Road, Old Rajinder Nagar, New Delhi 110060 · Since 1976</p>
+      </div>
+      </div>
+    </section>
+  );
+}

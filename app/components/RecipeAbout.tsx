@@ -20,6 +20,14 @@ function Peek({ src, alt, children }: { src: string; alt: string; children: Reac
   );
 }
 
+// The four figures the current homepage shows in its hero (apps/Vajiram-ravi data/home.ts), so nothing here is new or unverified.
+const stats = [
+  { n: "50+", label: "Years of experience since 1976" },
+  { n: "10/10", label: "Top rankers from V&R courses" },
+  { n: "59", label: "Questions reflected in Prelims" },
+  { n: "36/50", label: "CSE 2025 rankers from V&R" },
+] as const;
+
 export default function RecipeAbout() {
   return (
     <section id="about" className="rs-ab" aria-labelledby="about-title">
@@ -52,6 +60,15 @@ export default function RecipeAbout() {
             <Btn href="#faculty" variant="ink">Meet the faculty</Btn>
           </div>
         </div>
+
+        <ul data-pop="" className="rs-ab-stats" aria-label="Vajiram & Ravi in numbers">
+          {stats.map((x) => (
+            <li key={x.label}>
+              <b>{x.n}</b>
+              <span>{x.label}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

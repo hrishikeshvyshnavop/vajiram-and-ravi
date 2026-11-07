@@ -4,7 +4,6 @@ import Btn from "./RecipeButton";
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
-import { Roll } from "./Roll";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -130,15 +129,9 @@ export default function RecipeHeroFaceoff({ toppers }: { toppers: readonly HeroT
         </p>
 
         <div data-hero-cta="" className="mt-9 flex flex-wrap items-center justify-center gap-4">
-          {/* same button system as the header: one solid primary, one text link */}
-          <Btn href="#enrol">Enrol for UPSC 2027</Btn>
-          <a href="#toppers" className="rs-hdr-link !h-12 text-[var(--rs-cream)]">
-            <Roll text="Meet the toppers" />
-            {/* same stroke style as the ↗ arrow on the primary button */}
-            <svg viewBox="0 0 16 16" className="rs-hdr-down size-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" aria-hidden>
-              <path d="M8 2.5v11M3.5 9 8 13.5 12.5 9" />
-            </svg>
-          </a>
+          {/* a matched pair: two boxed buttons of the same size, one saffron (primary), one cream */}
+          <Btn href="#enrol" variant="saffron" className="rs-fo-cta">Enrol for UPSC 2027</Btn>
+          <Btn href="#toppers" variant="light" className="rs-fo-cta">Meet the toppers</Btn>
         </div>
 
       </div>
