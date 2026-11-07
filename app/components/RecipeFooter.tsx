@@ -1,6 +1,9 @@
 "use client";
 
+import Btn from "./RecipeButton";
 import { useState } from "react";
+import { Roll } from "./Roll";
+import { ArrowUpRight, PhoneIcon } from "./BtnIcons";
 import Link from "next/link";
 import RecipeFaq from "./RecipeFaq";
 
@@ -15,8 +18,8 @@ export const columns: { title: string; links: Item[] }[] = [
   {
     title: "Courses",
     links: [
-      { label: "UPSC GS Course 2027", href: "#programmes" },
-      { label: "UPSC GS Online Course 2027", href: "#programmes" },
+      { label: "UPSC GS Course 2027", href: "#courses" },
+      { label: "UPSC GS Online Course 2027", href: "#courses" },
       { label: "UPSC 2 Year Course" },
       { label: "UPSC 2 Year Online Course" },
       { label: "UPSC Online Coaching" },
@@ -28,13 +31,13 @@ export const columns: { title: string; links: Item[] }[] = [
   {
     title: "Test series & mentorship",
     links: [
-      { label: "UPSC Prelims Test Series 2027", href: "#programmes" },
+      { label: "UPSC Prelims Test Series 2027", href: "#courses" },
       { label: "UPSC Mains Test Series 2027" },
       { label: "Mains Test Series Hindi Medium" },
       { label: "UPSC Optional Test Series" },
       { label: "UPSC Mentorship Program 2027" },
       { label: "Mentorship Program Hindi Medium" },
-      { label: "Interview Guidance Program (IGP)", href: "#programmes" },
+      { label: "Interview Guidance Program (IGP)", href: "#courses" },
     ],
   },
   {
@@ -82,7 +85,7 @@ function FLink({ item, className = "" }: { item: Item; className?: string }) {
   );
 }
 
-export default function RecipeFooter() {
+export default function RecipeFooter({ enrolAnchor = false }: { enrolAnchor?: boolean }) {
   const [open, setOpen] = useState<number | null>(null);
 
   // Layout after Sharon's v-sharon footer: a centred closing call over the Parliament painting,
@@ -111,7 +114,8 @@ export default function RecipeFooter() {
         }}
       />
       {/* Closing call */}
-      <div className="mx-auto flex max-w-[1380px] flex-col items-center px-7 pt-20 text-center text-[var(--rs-deep)]">
+      {/* While the enrol section is hidden, every "Enrol" link (#enrol) lands on this closing call. */}
+      <div id={enrolAnchor ? "enrol" : undefined} className="mx-auto flex max-w-[calc(var(--rs-max)+56px)] scroll-mt-24 flex-col items-center px-7 pt-20 text-center text-[var(--rs-deep)]">
         <h2 className="rs-display text-[clamp(40px,5vw,76px)]">
           A district will need you.
           <br />
@@ -120,18 +124,17 @@ export default function RecipeFooter() {
         <p className="mt-5 max-w-[520px] text-[18px] leading-snug font-semibold text-[var(--rs-deep)]/80">
           From the first class in Old Rajinder Nagar to the oath you take under the Constitution, we walk the road with you.
         </p>
-        <div className="mt-7 flex flex-wrap justify-center gap-2">
-          <a href="#enrol" className="rs-pill !h-14 !bg-[var(--rs-deep)] !px-6 !text-[var(--rs-saffron)]">
-            Book free counselling →
-          </a>
-          <a href="tel:08062206330" className="rs-pill !h-14 !bg-[var(--rs-cream)] !px-6">
-            Call 080-6220-6330
+        <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
+          <Btn href="#enrol" variant="ink">Book free counselling</Btn>
+          <a href="tel:08062206330" className="rs-hdr-link rs-link-ink !h-12 font-semibold text-[var(--rs-deep)]">
+            <Roll text="Call 080-6220-6330" />
+            <PhoneIcon />
           </a>
         </div>
       </div>
 
       {/* Links over the dark base */}
-      <div className="mx-auto mt-[clamp(300px,28vw,440px)] max-w-[1380px] px-7">
+      <div className="mx-auto mt-[clamp(300px,28vw,440px)] max-w-[calc(var(--rs-max)+56px)] px-7">
         <div className="grid gap-12 lg:grid-cols-[300px_1fr] lg:gap-14">
           <div>
             <Link href="/" className="flex items-center gap-3" aria-label="Vajiram & Ravi">
@@ -154,11 +157,9 @@ export default function RecipeFooter() {
               <label htmlFor="rs-news" className="rs-small block text-[11px] text-[var(--rs-saffron)]">
                 Get exam updates
               </label>
-              <div className="mt-2 flex h-12 items-center rounded-full bg-white/10 pr-1.5 pl-4 ring-1 ring-white/25 backdrop-blur-sm focus-within:ring-2 focus-within:ring-[var(--rs-saffron)]">
+              <div className="mt-2 flex h-12 items-center bg-white/10 pr-1.5 pl-4 ring-1 ring-white/25 focus-within:ring-2 focus-within:ring-[var(--rs-saffron)]">
                 <input id="rs-news" type="email" required placeholder="you@example.com" className="min-w-0 flex-1 bg-transparent text-[14px] text-white outline-none placeholder:text-white/45" />
-                <button type="submit" className="rs-pill !h-9 !px-4 !text-[12px]">
-                  Subscribe
-                </button>
+                <Btn type="submit" variant="saffron" size="sm">Subscribe</Btn>
               </div>
             </form>
           </div>

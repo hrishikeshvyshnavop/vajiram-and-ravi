@@ -1,0 +1,6 @@
+/* Standalone page only (not loaded by the homepage embed). */
+html { -webkit-text-size-adjust: 100%; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+body { margin: 0; overflow-x: hidden; }
+body.is-loading { overflow: hidden; height: 100svh; }

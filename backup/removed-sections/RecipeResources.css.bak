@@ -1,0 +1,50 @@
+/* ---------- Free resources bento (RecipeResources.tsx, after Sharon's #resources) ---------- */
+.rs-res-grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
+@media (min-width: 768px) { .rs-res-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .rs-res-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } .rs-res-wide { grid-column: span 2; } }
+.rs-res-tile {
+  --bg: var(--rs-cream); --ink-t: var(--rs-deep); --line-t: rgba(45, 32, 29, 0.22); --acc: var(--rs-rust);
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-height: 320px; padding: 28px; overflow: hidden;
+  border-radius: 18px; color: var(--ink-t);
+  /* Sharon's soft spotlight that follows the cursor */
+  background: radial-gradient(360px circle at var(--sx, -400px) var(--sy, -400px), rgba(255, 255, 255, 0.45), transparent 65%), var(--bg);
+  transition: translate 450ms cubic-bezier(0.34, 1.56, 0.64, 1), rotate 450ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 300ms;
+}
+.rs-res-tile::before { content: ""; position: absolute; inset: 8px; border: 1px dashed var(--line-t); border-radius: 12px; pointer-events: none; }
+.rs-res-tile:hover { translate: 0 -6px; rotate: -1deg; box-shadow: 0 30px 50px -24px rgba(0, 0, 0, 0.6); }
+.rs-res-tile:focus-visible { outline: 3px solid var(--rs-saffron); outline-offset: 4px; }
+.rs-res-tile--saffron { --bg: var(--rs-saffron); }
+.rs-res-tile--rust { --bg: var(--rs-rust); --ink-t: var(--rs-cream); --line-t: rgba(252, 176, 51, 0.35); --acc: var(--rs-saffron); }
+.rs-res-tile--orange { --bg: var(--rs-orange); --ink-t: #fff8ee; --line-t: rgba(255, 255, 255, 0.35); --acc: #fff1d6; }
+.rs-res-tile--white { --bg: #fffdf8; }
+.rs-res-pill { display: inline-flex; align-items: baseline; gap: 8px; padding: 5px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.75); color: var(--rs-rust); font-family: var(--rs-display), sans-serif; font-weight: 800; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+.rs-res-pill i { font-style: normal; font-size: 13px; letter-spacing: 0; text-transform: none; opacity: 0.75; }
+.rs-res-tile--rust .rs-res-pill, .rs-res-tile--orange .rs-res-pill { background: rgba(255, 255, 255, 0.12); color: var(--acc); }
+.rs-res-icon { position: absolute; top: 22px; right: 22px; width: 62px; height: 62px; fill: none; stroke: var(--acc); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; transition: rotate 500ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.rs-res-tile:hover .rs-res-icon { rotate: -10deg; }
+.rs-res-acc { fill: var(--acc); fill-opacity: 0.18; }
+.rs-res-title { margin-top: auto; font-size: clamp(28px, 2.3vw, 38px); line-height: 1; }
+.rs-res-wide .rs-res-title { font-size: clamp(34px, 3vw, 52px); }
+.rs-res-text { max-width: 420px; font-size: 15.5px; font-weight: 500; line-height: 1.45; opacity: 0.85; }
+.rs-res-cta { margin-top: 4px; padding-bottom: 2px; border-bottom: 2px solid currentColor; font-family: var(--rs-display), sans-serif; font-weight: 800; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+/* current-affairs feed */
+.rs-res-feed { align-self: stretch; margin-top: 8px; padding: 14px 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.55); }
+.rs-res-feed li { display: flex; align-items: flex-start; gap: 10px; padding: 7px 8px; border-radius: 8px; transition: background-color 350ms, transform 350ms; }
+.rs-res-feed li b { display: block; font-size: 15px; }
+.rs-res-feed li small { display: block; font-size: 13px; opacity: 0.75; }
+.rs-res-feed li.is-on { background: #fff; transform: translateX(6px); box-shadow: 0 6px 14px -8px rgba(45, 32, 29, 0.5); }
+.rs-res-tag { flex: none; min-width: 64px; padding: 3px 8px; border-radius: 999px; background: var(--rs-rust); color: var(--rs-saffron); font-family: var(--rs-display), sans-serif; font-weight: 800; font-size: 10px; letter-spacing: 0.08em; text-align: center; text-transform: uppercase; }
+/* The Recitals: fanned magazine covers */
+.rs-res-mags { position: relative; align-self: center; width: 150px; height: 150px; margin: 8px 0 4px; }
+.rs-res-mags span { position: absolute; left: 30px; top: 0; display: flex; flex-direction: column; gap: 6px; width: 92px; height: 128px; padding: 10px 8px; border-radius: 4px; background: var(--c); color: var(--rs-deep); box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35); transform: rotate(calc((var(--i) - 1) * 12deg)) translateX(calc((var(--i) - 1) * 18px)); transform-origin: bottom center; transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.rs-res-mags b { font-family: var(--rs-paper-head), Georgia, serif; font-weight: 700; letter-spacing: -0.05em; font-size: 11px; line-height: 1; text-transform: uppercase; }
+.rs-res-mags i { display: block; height: 4px; border-radius: 2px; background: rgba(45, 32, 29, 0.25); }
+.rs-res-mags i:nth-of-type(2) { width: 70%; }
+.rs-res-tile:hover .rs-res-mags span { transform: rotate(calc((var(--i) - 1) * 20deg)) translateX(calc((var(--i) - 1) * 26px)); }
+/* calendar path */
+.rs-res-cal { position: relative; align-self: stretch; margin: 18px 4px 4px; }
+.rs-res-cal-line { position: absolute; left: 18px; right: 18px; top: 17px; height: 3px; transform-origin: left; background-image: radial-gradient(circle, var(--rs-rust) 1.3px, transparent 1.7px); background-size: 9px 3px; background-repeat: repeat-x; }
+.rs-res-cal ol { position: relative; display: flex; justify-content: space-between; }
+.rs-res-cal li { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.rs-res-cal-dot { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--rs-rust); color: var(--rs-saffron); font-family: var(--rs-serif), serif; font-weight: 800; font-size: 15px; box-shadow: 0 0 0 5px #fffdf8; }
+

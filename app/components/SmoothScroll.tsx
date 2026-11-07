@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 // `keepHash` (default true): in-page links write their #hash to the URL and arriving with a hash
 // jumps to it (e.g. /v1#cta). With keepHash={false} links scroll without touching the URL and any
 // hash and remembered scroll position are dropped on load, so a refresh starts at the top (used on /v5).
-export default function SmoothScroll({ children, keepHash = true }: { children: React.ReactNode; keepHash?: boolean }) {
+export default function SmoothScroll({ children, keepHash = true, smooth = 1.1 }: { children: React.ReactNode; keepHash?: boolean; smooth?: number }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -22,7 +22,7 @@ export default function SmoothScroll({ children, keepHash = true }: { children: 
     const smoother = ScrollSmoother.create({
       wrapper: wrapperRef.current!,
       content: contentRef.current!,
-      smooth: reduceMotion ? 0 : 1.1,
+      smooth: reduceMotion ? 0 : smooth,
       effects: true,
       smoothTouch: false,
     });
@@ -88,7 +88,7 @@ export default function SmoothScroll({ children, keepHash = true }: { children: 
       window.removeEventListener("hashchange", onHashChange);
       smoother.kill();
     };
-  }, [keepHash]);
+  }, [keepHash, smooth]);
 
   return (
     <div ref={wrapperRef} id="smooth-wrapper">

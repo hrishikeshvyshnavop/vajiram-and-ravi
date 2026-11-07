@@ -9,10 +9,16 @@ type Route = { href: string; name: string; tag: string; summary: string };
 // route exists; move it to `archive` when it is no longer a candidate.
 const primary: Route[] = [
   {
+    href: "/manifesto",
+    name: "Manifesto (scroll film)",
+    tag: "Iteration 11",
+    summary: "Read the nation, Write with conviction, Serve with integrity: preloader, a Read / Write / Serve timeline hero, horizontal tracks, stacked value cards, a gallery, a poem and a breathing footer, with WebGL smoke the cursor parts. Interim photos from the project library (after manifesto.blandina.org).",
+  },
+  {
     href: "/v5",
     name: "Your UPSC journey (bold Indian)",
     tag: "Iteration 10",
-    summary: "Rust-and-saffron landing with Indian type and Hindi lines: the team's India collage reacts to the mouse, tilts and breaks into the GS syllabus on scroll; toppers, faculty, FAQ, lead form and a Parliament footer (after eathungrytiger.com).",
+    summary: "Rust-and-saffron landing with Indian type and Hindi lines: a toppers face-off hero (AIR 1 and AIR 2, after bowiesheroes.tilda.ws); toppers, faculty, FAQ, lead form and a Parliament footer (after eathungrytiger.com).",
   },
   {
     href: "/v4",
@@ -42,6 +48,12 @@ const primary: Route[] = [
 
 // Everything else stays reachable at its own URL, listed under Archive.
 const archivedIterations: Route[] = [
+  {
+    href: "/v5-collage",
+    name: "Your UPSC journey · collage hero (backup)",
+    tag: "Iteration 10 · backup",
+    summary: "/v5 as it was before the toppers face-off hero: copy on the left and the team's India collage on the right, with mouse parallax. Every other section matches /v5.",
+  },
   {
     href: "/v2",
     name: "Full-bleed hero",

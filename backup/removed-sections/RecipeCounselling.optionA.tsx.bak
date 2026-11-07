@@ -1,0 +1,171 @@
+"use client";
+
+import Btn from "./RecipeButton";
+import { useRef, useState } from "react";
+
+// Counselling callback strip (storyline section 9: docs/STORYLINE_HOMEPAGE.md).
+//   "I'd like to ask someone."  ->  the human fallback: name, mobile and a preferred time, nothing more to fill in.
+// It owns the #enrol anchor, so every "Enrol for 2027" / "Talk to a counsellor" button on the page lands here.
+//
+// NOT CONNECTED YET: there is no backend in this project. Set NEXT_PUBLIC_CALLBACK_URL to an endpoint that accepts a JSON
+// POST ({ name, phone, time, interest }) and the form sends there; until then nothing is sent and the form says so
+// (SHOW_DEMO_NOTE). Do not remove the note before an endpoint is wired, or visitors would think a call was booked.
+const ENDPOINT = process.env.NEXT_PUBLIC_CALLBACK_URL;
+const SHOW_DEMO_NOTE = !ENDPOINT;
+
+const TIMES = ["Morning · 9 AM – 12 PM", "Afternoon · 12 PM – 4 PM", "Evening · 4 PM – 7 PM"] as const;
+const INTERESTS = ["Not sure yet", "Foundation", "Prelims", "Mains", "Interview"] as const;
+
+type Errors = Partial<Record<"name" | "phone" | "time", string>>;
+type Status = "idle" | "sending" | "sent" | "failed";
+
+async function sendCallback(data: { name: string; phone: string; time: string; interest: string }) {
+  if (!ENDPOINT) {
+    await new Promise((r) => setTimeout(r, 500)); // demo: nothing leaves the browser
+    return;
+  }
+  const res = await fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+  if (!res.ok) throw new Error(`Callback request failed: ${res.status}`);
+}
+
+export default function RecipeCounselling() {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [time, setTime] = useState<string>("");
+  const [interest, setInterest] = useState<string>(INTERESTS[0]);
+  const [errors, setErrors] = useState<Errors>({});
+  const [status, setStatus] = useState<Status>("idle");
+  const doneRef = useRef<HTMLHeadingElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+
+  const validate = (): Errors => {
+    const e: Errors = {};
+    if (name.trim().length < 2) e.name = "Please enter your name.";
+    if (!/^[6-9]\d{9}$/.test(phone)) e.phone = "Enter a 10-digit Indian mobile number.";
+    if (!time) e.time = "Choose a time that suits you.";
+    return e;
+  };
+
+  const onSubmit = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length) {
+      (e.name ? nameRef : e.phone ? phoneRef : null)?.current?.focus();
+      return;
+    }
+    setStatus("sending");
+    try {
+      await sendCallback({ name: name.trim(), phone: `+91${phone}`, time, interest });
+      setStatus("sent");
+      setTimeout(() => doneRef.current?.focus(), 50);
+    } catch {
+      setStatus("failed");
+    }
+  };
+
+  const sent = status === "sent";
+
+  return (
+    <section id="enrol" className="relative overflow-hidden bg-[var(--rs-cream)] px-7 py-28 text-[var(--rs-rust)]">
+      <div className="relative mx-auto grid max-w-[var(--rs-max)] gap-14 lg:grid-cols-[1fr_1fr] lg:items-center">
+        {/* ---- the promise ---- */}
+        <div>
+          <p data-pop="" className="rs-small text-[14px] opacity-80">
+            Free counselling · <span lang="hi" className="rs-hi normal-case">निःशुल्क परामर्श</span>
+          </p>
+          <h2 data-pop="" className="rs-display mt-4 text-[clamp(52px,6.6vw,108px)]">
+            Talk to a
+            <br />
+            counsellor
+          </h2>
+          <p data-pop="" className="mt-6 max-w-[500px] text-xl leading-snug text-[var(--rs-deep)]/90">
+            Leave your number. A counsellor will call you back at the time you choose, map your stage, your optional and the mode that suits you, and help you pick the programme.
+          </p>
+          <ul data-pop="" className="rs-small mt-8 flex flex-col gap-2.5 text-[13px] text-[var(--rs-deep)]">
+            <li>✺ Free · about 15 minutes</li>
+            <li>✺ English and हिंदी</li>
+            <li>✺ New Delhi · Chennai · Online</li>
+          </ul>
+          <p data-pop="" className="mt-8 text-lg text-[var(--rs-deep)]/90">
+            Prefer to call?{" "}
+            <a href="tel:+918062206330" className="rs-prog-link !mt-0 !inline-flex">080-6220-6330</a>
+            <span className="block text-[15px] opacity-75">Mon – Sat, 9 AM – 7 PM</span>
+          </p>
+        </div>
+
+        {/* ---- the form ---- */}
+        <div data-pop="" className="rs-cb-card">
+          {sent ? (
+            <div role="status" className="flex min-h-[420px] flex-col justify-center gap-5">
+              <span className="rs-cb-tick" aria-hidden>
+                <svg viewBox="0 0 16 16" className="size-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="square">
+                  <path d="M2.5 8.5 6.5 12.5 13.5 4" />
+                </svg>
+              </span>
+              <h3 ref={doneRef} tabIndex={-1} className="rs-display text-[clamp(36px,3.6vw,56px)] outline-none">
+                Thank you, {name.trim().split(" ")[0]}
+              </h3>
+              <p className="max-w-[440px] text-lg leading-snug opacity-95">
+                A counsellor will call +91 {phone} in the {time.split(" · ")[0].toLowerCase()} slot ({time.split(" · ")[1]}).
+              </p>
+              {SHOW_DEMO_NOTE && <p className="rs-cb-demo">Demo: this form is not connected yet, so no call request was actually sent.</p>}
+              <button type="button" className="rs-cb-link" onClick={() => setStatus("idle")}>Change my details</button>
+            </div>
+          ) : (
+            <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6" aria-describedby={SHOW_DEMO_NOTE ? "cb-demo" : undefined}>
+              <h3 className="rs-display text-[clamp(30px,2.8vw,44px)]">Request a call back</h3>
+
+              <div>
+                <label htmlFor="cb-name" className="rs-cb-label">Your name</label>
+                <input ref={nameRef} id="cb-name" name="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!errors.name} aria-describedby={errors.name ? "cb-name-err" : undefined} className="rs-cb-input" />
+                {errors.name && <p id="cb-name-err" className="rs-cb-err">{errors.name}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="cb-phone" className="rs-cb-label">Mobile number</label>
+                <div className="rs-cb-phone">
+                  <span aria-hidden>+91</span>
+                  <input ref={phoneRef} id="cb-phone" name="phone" type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "cb-phone-err" : undefined} className="rs-cb-input !rounded-l-none" />
+                </div>
+                {errors.phone && <p id="cb-phone-err" className="rs-cb-err">{errors.phone}</p>}
+              </div>
+
+              <fieldset>
+                <legend className="rs-cb-label">Best time to call</legend>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {TIMES.map((t) => (
+                    <label key={t} className={`rs-cb-chip ${time === t ? "is-on" : ""}`}>
+                      <input type="radio" name="time" value={t} checked={time === t} onChange={() => setTime(t)} className="sr-only" />
+                      {t}
+                    </label>
+                  ))}
+                </div>
+                {errors.time && <p className="rs-cb-err">{errors.time}</p>}
+              </fieldset>
+
+              <div>
+                <label htmlFor="cb-interest" className="rs-cb-label">I am interested in <span className="opacity-60">(optional)</span></label>
+                <select id="cb-interest" name="interest" value={interest} onChange={(e) => setInterest(e.target.value)} className="rs-cb-input">
+                  {INTERESTS.map((i) => (
+                    <option key={i}>{i}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <Btn type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : "Request a call"}</Btn>
+                <p className="max-w-[260px] text-[13px] leading-snug opacity-80">We will call only about your enquiry.</p>
+              </div>
+              {status === "failed" && (
+                <p role="alert" className="rs-cb-err">We could not send that. Please try again, or call 080-6220-6330.</p>
+              )}
+              {SHOW_DEMO_NOTE && <p id="cb-demo" className="rs-cb-demo">Demo: this form is not connected yet, so no call request is sent.</p>}
+            </form>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}

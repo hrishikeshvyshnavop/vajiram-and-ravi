@@ -5,6 +5,7 @@ homepage iteration with a live preview; each iteration is its own route.
 
 | Route | What it is |
 | --- | --- |
+| `/manifesto` | Manifesto scroll film (Iteration 11, after manifesto.blandina.org; source in apps/manifesto, synced on dev/build) — primary |
 | `/v5` | Your UPSC journey, bold Indian landing (Iteration 10, after eathungrytiger.com) — primary |
 | `/v4` | Brand story, horizontal editorial scroll (Iteration 9, after canals-amsterdam.com) — primary |
 | `/constitution-book` | Constitution book (Iteration 8) — primary |

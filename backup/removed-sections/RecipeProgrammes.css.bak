@@ -1,0 +1,61 @@
+/* ---------- Programmes by stage (RecipeProgrammes.tsx) ---------- */
+.rs-prog-tab { display: inline-flex; align-items: baseline; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 16px; line-height: 48px; color: var(--rs-rust); box-shadow: inset 0 0 0 2px rgba(141, 46, 19, 0.35); transition: background-color 250ms, color 250ms, box-shadow 250ms; }
+.rs-prog-tab:hover { box-shadow: inset 0 0 0 2px var(--rs-rust); }
+.rs-prog-tab.is-on { background: var(--rs-saffron); color: var(--rs-deep); box-shadow: none; }
+.rs-prog-tab:focus-visible { outline: 2px solid var(--rs-rust); outline-offset: 3px; }
+.rs-prog-grid { animation: rs-prog-in 380ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+@keyframes rs-prog-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.rs-prog-card { display: flex; flex-direction: column; padding: 22px 22px 24px; border-radius: 20px; background: #fff7e4; box-shadow: inset 0 0 0 2px rgba(141, 46, 19, 0.14); color: var(--rs-deep); transition: transform 350ms cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 350ms; }
+.rs-prog-card:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 2px rgba(141, 46, 19, 0.4), 0 18px 30px -22px rgba(45, 18, 9, 0.5); }
+.rs-prog-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; width: fit-content; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 14px; color: var(--rs-rust); border-bottom: 2px solid currentColor; padding-bottom: 2px; }
+.rs-prog-link:hover { color: var(--rs-orange); }
+.rs-prog-link:focus-visible { outline: 2px solid var(--rs-rust); outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .rs-prog-grid { animation: none; } .rs-prog-card { transition: none; } }
+
+/* perf: the newspaper photos "develop" (opacity) on their own layers, so their filters are rasterised once, not every frame of the fade */
+.rs-paper-sheet [data-develop] { will-change: opacity; }
+/* perf: the hero title drifts on scroll; its tricolour fill and brush masks are SVG images with turbulence filters,
+   so it gets its own layer and is rasterised once instead of every frame */
+.rs-fo-title { will-change: transform; }
+
+/* ---------- Programmes: the stage stack, after omni.org "Rigorous Research to Expand your Impact" (RecipeProgrammes.tsx) ---------- */
+.rs-stack { position: relative; }
+.rs-stack-card { position: relative; display: grid; min-height: 100svh; overflow: hidden; will-change: transform; }
+.rs-stack-artwrap { position: relative; height: 200px; will-change: transform; }
+.rs-stack-art { display: block; width: 100%; height: 100%; }
+.rs-stack-copy { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 40px; padding: 48px 28px 56px; }
+.rs-stack-title { word-spacing: 0.12em; font-family: var(--rs-paper-head), Georgia, serif; font-weight: 700; text-transform: none; letter-spacing: -0.065em; line-height: 1.02; font-size: clamp(40px, 4.4vw, 76px); max-width: 14ch; }
+.rs-stack-btn { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 24px; border-radius: 999px; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 16px; color: inherit; box-shadow: inset 0 0 0 1px var(--st-outline); transition: background-color 250ms, color 250ms; }
+.rs-stack-btn:hover { background: var(--st-ink); color: var(--st-bg); }
+.rs-stack-btn:focus-visible, .rs-stack-pill:focus-visible { outline: 2px solid var(--st-ink); outline-offset: 3px; }
+.rs-stack-pill { padding: 8px 14px; border-radius: 999px; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: inherit; box-shadow: inset 0 0 0 1px var(--st-outline); transition: background-color 200ms, color 200ms; }
+.rs-stack-pill:hover { box-shadow: inset 0 0 0 2px var(--st-ink); }
+.rs-stack-pill.is-on { background: var(--st-ink); color: var(--st-bg); box-shadow: none; }
+.rs-stack-detail { min-height: 128px; }
+@media (min-width: 1024px) {
+  .rs-stack:not(.is-flat) { height: 100svh; overflow: hidden; }
+  .rs-stack:not(.is-flat) .rs-stack-card { position: absolute; inset: 0; grid-template-columns: 1fr 1fr; }
+  .rs-stack:not(.is-ready) .rs-stack-card:not(:first-child) { visibility: hidden; } /* until the stack is set up */
+  .rs-stack-artwrap { order: 2; height: auto; }
+  .rs-stack-copy { order: 1; padding: 120px 28px 64px max(28px, calc((100vw - var(--rs-max)) / 2 + 28px)); }
+}
+@media (prefers-reduced-motion: reduce) { .rs-stack-card, .rs-stack-artwrap { will-change: auto; } }
+
+/* ---------- Programmes: the rethought flagship (RecipeProgrammes.tsx) ---------- */
+.rs-flag { display: grid; gap: 40px; padding: 28px; border-radius: 28px; background: var(--rs-rust); color: var(--rs-cream); }
+.rs-flag-main { display: flex; flex-direction: column; align-items: flex-start; gap: 24px; min-width: 0; }
+.rs-flag-side { display: flex; flex-direction: column; gap: 36px; min-width: 0; }
+.rs-flag-track { margin-top: 10px; height: 14px; border-radius: 999px; background: rgba(254, 248, 236, 0.16); overflow: hidden; }
+.rs-flag-fill { display: block; height: 100%; border-radius: 999px; background: var(--rs-saffron); transform-origin: 0 50%; animation: rs-flag-grow 1100ms cubic-bezier(0.22, 0.61, 0.36, 1) both; animation-timeline: view(); animation-range: entry 10% cover 35%; }
+@keyframes rs-flag-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.rs-flag-paths { grid-column: 1 / -1; display: grid; gap: 14px; padding-top: 28px; border-top: 1px dashed rgba(254, 248, 236, 0.3); }
+.rs-flag-path { position: relative; display: flex; flex-direction: column; padding: 20px 22px; border-radius: 18px; background: rgba(254, 248, 236, 0.08); box-shadow: inset 0 0 0 1px rgba(254, 248, 236, 0.25); transition: background-color 250ms, box-shadow 250ms; }
+.rs-flag-path:hover { background: rgba(254, 248, 236, 0.16); box-shadow: inset 0 0 0 1px var(--rs-saffron); }
+.rs-flag-path:focus-visible { outline: 2px solid var(--rs-saffron); outline-offset: 3px; }
+.rs-flag-path-go { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 14px; color: var(--rs-saffron); }
+@media (min-width: 1024px) {
+  .rs-flag { grid-template-columns: 1.1fr 0.9fr; gap: 48px 64px; padding: 56px; }
+  .rs-flag-paths { grid-template-columns: 1fr 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .rs-flag-fill { animation: none; } }
+

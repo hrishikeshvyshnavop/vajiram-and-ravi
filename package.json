@@ -6,10 +6,13 @@
     "node": ">=20.9.0"
   },
   "scripts": {
+    "sync:manifesto": "node scripts/sync-manifesto.mjs",
+    "predev": "node scripts/sync-manifesto.mjs",
     "dev": "node node_modules/next/dist/bin/next dev",
     "build": "node scripts/clean-build-cache.mjs && node node_modules/next/dist/bin/next build",
     "start": "node node_modules/next/dist/bin/next start",
-    "lint": "node node_modules/eslint/bin/eslint.js"
+    "lint": "node node_modules/eslint/bin/eslint.js",
+    "prebuild": "node scripts/sync-manifesto.mjs"
   },
   "dependencies": {
     "gsap": "^3.15.0",

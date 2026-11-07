@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function V5() {
   return (
     <main className="flex flex-1 flex-col">
-      <RecipeStory fontClass={recipeFonts} />
+      <RecipeStory fontClass={recipeFonts} teamEntry="sweep" teamLook="collage" />
     </main>
   );
 }

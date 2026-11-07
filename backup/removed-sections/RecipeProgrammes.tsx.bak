@@ -1,0 +1,359 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
+// Programmes by stage (storyline sections 5 and 6: docs/STORYLINE_HOMEPAGE.md).
+//   Q3 "What is right for me?"  ->  a flagship answer first ("just tell me what most people take"),
+//   then the stage stack (Foundation / Prelims / Mains / Interview) in the style of the "Rigorous Research to Expand
+//   your Impact" section on omni.org: full-bleed colour panels that slide over each other, a two-tone headline, an
+//   outline pill, programme tag pills and pattern art on the right half. Colours are V&R brand colours; fonts are the
+//   page's own.
+// Names, durations and "for" lines come from docs/research/VAJIRAM_RAVI_DOMAIN_OVERVIEW.md (products + personas)
+// and the current site. Prices are left out on purpose: the research notes flag two different GS prices
+// (Rs 1,55,000 vs Rs 1,80,000), and the storyline rule is "only verified facts". Every panel exits to a counsellor.
+
+type Programme = { name: string; forWho: string; tags: string[]; line: string };
+// Minimal Indian line-art motifs for the right half of each panel: jaali (carved stone screen), buti (block-print
+// paisley), kolam (dots and looping diamonds) and padma (lotus).
+type Pattern = "jaali" | "buti" | "kolam" | "padma";
+type Stage = {
+  id: string;
+  label: string;
+  hi: string;
+  intro: string;
+  programmes: Programme[];
+  /** Two-tone headline, as on omni.org: strong first half, tinted second half. */
+  title: [string, string];
+  /** Panel colours and the pattern art on the right half. */
+  theme: { bg: string; ink: string; accent: string; art: string; pattern: Pattern };
+};
+
+const BOTH = "Classroom & LIVE-online";
+
+const stages: Stage[] = [
+  {
+    id: "foundation",
+    title: ["A solid Foundation", "to start from scratch."],
+    theme: { bg: "#d1570e", ink: "#ffffff", accent: "#ffd2b3", art: "#f8a06b", pattern: "jaali" },
+    label: "Foundation",
+    hi: "आधार",
+    intro: "Starting out? A full plan for the whole syllabus, in one place.",
+    programmes: [
+      { name: "GS Prelims cum Mains + CSAT 2027", forWho: "First attempt, graduates", tags: ["11 months", BOTH], line: "The flagship programme with the CSAT course built in." },
+      { name: "2-Year PCM Fledgling Programme 2028", forWho: "College students", tags: ["2 years", BOTH], line: "Start early and prepare at a slower pace alongside your degree." },
+      { name: "CSAT Course", forWho: "Add-on to any foundation", tags: ["3.5 months", BOTH], line: "Prepare for the qualifying Prelims paper, where 33% is needed." },
+      { name: "Optional Subject Coaching", forWho: "Choosing an optional", tags: ["20–30 weeks", BOTH], line: "Geography, History, Sociology, Psychology, Economics, Political Science and more." },
+    ],
+  },
+  {
+    id: "prelims",
+    title: ["Sharper Prelims", "to build speed and accuracy."],
+    theme: { bg: "#8d2e13", ink: "#ffffff", accent: "#f3b9a3", art: "#d8795a", pattern: "buti" },
+    label: "Prelims",
+    hi: "प्रारंभिक",
+    intro: "Practice that builds speed and accuracy before the first stage.",
+    programmes: [
+      { name: "PowerUp Prelims Test Series", forWho: "Anyone sitting Prelims", tags: ["Test series", BOTH], line: "Full-length tests with detailed explanations." },
+      { name: "PowerUp Current Affairs Test Series", forWho: "Current affairs practice", tags: ["Test series", BOTH], line: "Current affairs tests for Prelims." },
+      { name: "Prelims CAMP", forWho: "Focused Prelims preparation", tags: ["Batch", BOTH], line: "Prelims classes and practice tests that build speed and accuracy." },
+      { name: "SMART Prelims Current Affairs Programme", forWho: "Prelims current affairs", tags: ["Programme", BOTH], line: "Current affairs taught the way Prelims asks them, with revision built in." },
+    ],
+  },
+  {
+    id: "mains",
+    title: ["Stronger Mains", "to master written answers."],
+    theme: { bg: "#3a2118", ink: "#ffffff", accent: "#e8c4a0", art: "#9a6a52", pattern: "kolam" },
+    label: "Mains",
+    hi: "मुख्य",
+    intro: "Written answers: Essay, four GS papers and two optional papers.",
+    programmes: [
+      { name: "Sure Shot Mains Programme", forWho: "Prelims qualifiers and repeaters", tags: ["Mains", "Test series"], line: "Answer writing and tests, with model answers for Mains." },
+      { name: "StepUp Mentorship", forWho: "Repeaters; Hindi medium discounted", tags: ["Mentorship", "English & हिंदी"], line: "A mentor who tells you where you stand and what to fix next." },
+      { name: "StepUp Mains Advance", forWho: "Last-stretch GS revision", tags: ["Crash course", "GS"], line: "A GS crash course before the Mains." },
+      { name: "Essay and Ethics modules", forWho: "Essay and GS IV", tags: ["Module courses"], line: "Short, focused courses on two papers that reward practice." },
+    ],
+  },
+  {
+    id: "interview",
+    title: ["Interview Guidance", "to face the board prepared."],
+    theme: { bg: "#fcb033", ink: "#2d1209", accent: "rgba(45,18,9,0.55)", art: "#a8650a", pattern: "padma" },
+    label: "Interview",
+    hi: "साक्षात्कार",
+    intro: "The Personality Test before a UPSC board.",
+    programmes: [
+      { name: "Interview Guidance Programme (IGP)", forWho: "Mains qualifiers", tags: ["Interview", BOTH], line: "9 of the CSE 2025 top 10 prepared for the Personality Test with it." },
+    ],
+  },
+];
+
+// Storyline section 6: the flagship. Marks are from the exam pattern, as on the current site (GS Paper I of 200 for Prelims,
+// GS papers 1,000 of the 1,750 written Mains marks). The inclusions and the two paths are the current site copy.
+const flagshipMarks = [
+  { stage: "Prelims", marks: "200", total: "200", pct: 100 },
+  { stage: "Mains", marks: "1,000", total: "1,750", pct: Math.round((1000 / 1750) * 100) },
+];
+const flagshipInside = ["Daily classes", "Printed study material", "Prelims and Mains tests", "Mentoring", "Classroom or LIVE-online"];
+const flagshipPaths = [
+  { who: "Graduates", name: "GS Prelims cum Mains", note: "The 11-month programme." },
+  { who: "College students", name: "2-Year Fledgling", note: "Start early, at a slower pace." },
+];
+
+/**
+ * Minimal Indian line-art for the right half of a panel (user 2026-11-07: "indian minimal patterns"). Fine strokes in one
+ * tint, tiled as SVG patterns, so they stay crisp at any width and cost almost nothing to paint:
+ *   jaali  - the carved stone screen: two squares make an eight-point star, joined by small rings
+ *   buti   - block-print paisley, in alternating directions
+ *   kolam  - the floor drawing: a dot grid with looping diamonds
+ *   padma  - the lotus: a centre petal, two side petals and a base line
+ */
+function Art({ pattern, color, id }: { pattern: Pattern; color: string; id: string }) {
+  const pid = `art-${id}`;
+  const line = { fill: "none", stroke: color, strokeWidth: 2.4, strokeLinejoin: "round", strokeLinecap: "round" } as const;
+  return (
+    <svg className="rs-stack-art" viewBox="0 0 600 900" preserveAspectRatio="xMidYMid slice" aria-hidden>
+      <defs>
+        {pattern === "jaali" && (
+          <pattern id={pid} width="120" height="120" patternUnits="userSpaceOnUse">
+            <path d="M20 20H100V100H20Z" {...line} />
+            <path d="M60 0L120 60L60 120L0 60Z" {...line} />
+            <circle cx="60" cy="60" r="9" {...line} />
+            <circle cx="0" cy="0" r="9" {...line} />
+            <circle cx="120" cy="0" r="9" {...line} />
+            <circle cx="0" cy="120" r="9" {...line} />
+            <circle cx="120" cy="120" r="9" {...line} />
+          </pattern>
+        )}
+        {pattern === "buti" && (
+          <pattern id={pid} width="130" height="130" patternUnits="userSpaceOnUse">
+            <g transform="translate(33 33) rotate(28)">
+              <path d="M0 -34C26 -26 28 10 0 36C-22 18 -24 -18 0 -34Z" fill={color} />
+              <path d="M0 -18C10 -8 10 8 0 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+            </g>
+            <g transform="translate(98 98) rotate(-152)">
+              <path d="M0 -34C26 -26 28 10 0 36C-22 18 -24 -18 0 -34Z" fill={color} />
+              <path d="M0 -18C10 -8 10 8 0 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+            </g>
+            <circle cx="98" cy="30" r="3.5" fill={color} />
+            <circle cx="30" cy="100" r="3.5" fill={color} />
+          </pattern>
+        )}
+        {pattern === "kolam" && (
+          <pattern id={pid} width="100" height="100" patternUnits="userSpaceOnUse">
+            <path d="M50 0L100 50L50 100L0 50Z" {...line} />
+            <path d="M50 22C70 22 78 30 78 50C78 70 70 78 50 78C30 78 22 70 22 50C22 30 30 22 50 22Z" {...line} />
+            <circle cx="50" cy="50" r="3.5" fill={color} />
+            <circle cx="0" cy="0" r="3.5" fill={color} />
+            <circle cx="100" cy="0" r="3.5" fill={color} />
+            <circle cx="0" cy="100" r="3.5" fill={color} />
+            <circle cx="100" cy="100" r="3.5" fill={color} />
+          </pattern>
+        )}
+        {pattern === "padma" && (
+          <pattern id={pid} width="110" height="110" patternUnits="userSpaceOnUse">
+            <path d="M55 12C70 34 70 58 55 80C40 58 40 34 55 12Z" {...line} />
+            <path d="M55 80C32 74 16 56 16 36C36 40 50 58 55 80Z" {...line} />
+            <path d="M55 80C78 74 94 56 94 36C74 40 60 58 55 80Z" {...line} />
+            <path d="M24 92H86" {...line} />
+            <circle cx="55" cy="100" r="3.5" fill={color} />
+          </pattern>
+        )}
+      </defs>
+      <rect width="600" height="900" fill={`url(#${pid})`} />
+    </svg>
+  );
+}
+
+function StageCard({ stage, index, total }: { stage: Stage; index: number; total: number }) {
+  const [sel, setSel] = useState(0);
+  const prog = stage.programmes[sel] ?? stage.programmes[0];
+  const { bg, ink, accent, art, pattern } = stage.theme;
+  const outline = ink === "#ffffff" ? "rgba(255,255,255,0.85)" : "rgba(45,18,9,0.8)";
+  const vars = { background: bg, color: ink, "--st-ink": ink, "--st-outline": outline, "--st-bg": bg } as React.CSSProperties;
+  return (
+    <article data-stack-card="" className="rs-stack-card" style={vars} aria-labelledby={`stage-${stage.id}-h`}>
+      <div data-stack-art="" className="rs-stack-artwrap">
+        <Art pattern={pattern} color={art} id={stage.id} />
+      </div>
+      <div className="rs-stack-copy">
+        <div>
+          <p className="rs-small text-[13px] opacity-80">
+            Stage {index + 1} of {total} · <span lang="hi" className="rs-hi normal-case">{stage.hi}</span>
+          </p>
+          <h3 id={`stage-${stage.id}-h`} className="rs-stack-title mt-4">
+            {stage.title[0]} <span style={{ color: accent }}>{stage.title[1]}</span>
+          </h3>
+          <p className="mt-5 max-w-[520px] text-xl leading-snug opacity-95">{stage.intro}</p>
+          <a href="#enrol" className="rs-stack-btn mt-7">
+            Ask a counsellor
+            <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" aria-hidden>
+              <path d="M2 8h11M9 4l4 4-4 4" />
+            </svg>
+          </a>
+        </div>
+
+        <div>
+          <div aria-live="polite" className="rs-stack-detail">
+            <p className="rs-display text-[28px] leading-none">{prog.name}</p>
+            <p className="rs-small mt-2 text-[12px] opacity-80">For: {prog.forWho} · {prog.tags.join(" · ")}</p>
+            <p className="mt-2 max-w-[520px] text-base leading-snug opacity-95">{prog.line}</p>
+          </div>
+          <p className="rs-small mt-6 text-[13px]">{stage.label} programmes</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {stage.programmes.map((p, i) => (
+              <button key={p.name} type="button" aria-pressed={i === sel} onClick={() => setSel(i)} className={`rs-stack-pill ${i === sel ? "is-on" : ""}`}>
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export default function RecipeProgrammes() {
+  const stackRef = useRef<HTMLDivElement>(null);
+
+  // omni.org-style stack: the section pins and each stage panel slides up over the one before it while its
+  // pattern art trails a little. Desktop only; phones and reduced motion get plain stacked panels.
+  useEffect(() => {
+    const root = stackRef.current!;
+    const cards = gsap.utils.toArray<HTMLElement>("[data-stack-card]", root);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mm = gsap.matchMedia();
+    mm.add("(min-width: 1024px)", () => {
+      if (reduce) {
+        root.classList.add("is-ready", "is-flat");
+        return () => root.classList.remove("is-ready", "is-flat");
+      }
+      gsap.set(cards.slice(1), { yPercent: 100 });
+      root.classList.add("is-ready");
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: { trigger: root, start: "top top", end: () => `+=${(cards.length - 1) * 100}%`, pin: true, scrub: true, invalidateOnRefresh: true },
+      });
+      cards.forEach((card, i) => {
+        if (i === 0) return;
+        tl.to(card, { yPercent: 0, duration: 1 }, i - 1);
+        // the art arrives a beat behind its panel
+        tl.fromTo(card.querySelector("[data-stack-art]"), { yPercent: 14 }, { yPercent: 0, duration: 1 }, i - 1);
+      });
+      return () => root.classList.remove("is-ready");
+    });
+    mm.add("(max-width: 1023px)", () => {
+      root.classList.add("is-ready", "is-flat");
+      return () => root.classList.remove("is-ready", "is-flat");
+    });
+    return () => mm.revert();
+  }, []);
+
+  return (
+    <section id="programmes" className="relative bg-[var(--rs-cream)] text-[var(--rs-rust)]">
+      <div className="relative mx-auto max-w-[var(--rs-max)] px-7 pt-28 pb-20">
+        {/* ---- heading ---- */}
+        <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-end">
+          <div>
+            <p data-pop="" className="rs-small text-[14px] opacity-80">
+              Programmes · <span lang="hi" className="rs-hi normal-case">कार्यक्रम</span>
+            </p>
+            <h2 data-pop="" className="rs-display mt-4 text-[clamp(52px,6.6vw,108px)]">
+              Pick your
+              <br />
+              stage
+            </h2>
+          </div>
+          <p data-pop="" className="max-w-[460px] text-xl leading-snug text-[var(--rs-deep)]/85">
+            From your first GS class to the interview: pick the stage you are at, then the programme. Not sure? A counsellor will match you.
+          </p>
+        </div>
+
+        {/* ---- flagship: "just tell me what to take" (rethought 2026-11-07: marks as bars, what's inside, which one is yours) ---- */}
+        <article data-pop="" className="rs-flag mt-14">
+          <div className="rs-flag-main">
+            <span className="inline-flex h-8 w-fit items-center rounded-full bg-[var(--rs-saffron)] px-4 text-[13px] font-bold tracking-wide text-[var(--rs-deep)] uppercase">Start here · Our flagship</span>
+            <h3 className="rs-display text-[clamp(40px,5vw,84px)]">
+              Most of your marks
+              <br />
+              come from <span className="text-[var(--rs-saffron)]">General Studies</span>
+            </h3>
+            <p className="max-w-[520px] text-xl leading-snug text-[var(--rs-cream)]/90">
+              So the flagship covers it end to end: the full GS syllabus, from your first class to the Mains.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <a href="#enrol" className="rs-cta">Enrol in the GS programme</a>
+              <a href="#enrol" className="rs-cta rs-cta-ghost">Talk to a counsellor</a>
+            </div>
+          </div>
+
+          <div className="rs-flag-side">
+            <div>
+              <p className="rs-small text-[13px] text-[var(--rs-saffron)]">Marks that come from General Studies</p>
+              <ul className="mt-5 flex flex-col gap-6">
+                {flagshipMarks.map((m) => (
+                  <li key={m.stage}>
+                    <div className="flex items-baseline justify-between gap-4">
+                      <span className="rs-display text-[28px]">{m.stage}</span>
+                      <span className="text-lg font-bold">
+                        {m.marks} <span className="font-medium opacity-70">of {m.total}</span>
+                      </span>
+                    </div>
+                    <div className="rs-flag-track" role="img" aria-label={`${m.stage}: ${m.marks} of ${m.total} marks come from General Studies`}>
+                      <span className="rs-flag-fill" style={{ width: `${m.pct}%` }} />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="rs-small text-[13px] text-[var(--rs-saffron)]">What is inside</p>
+              <ul className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+                {flagshipInside.map((t) => (
+                  <li key={t} className="flex items-start gap-3 text-base leading-snug">
+                    <svg viewBox="0 0 16 16" className="mt-1 size-4 shrink-0 text-[var(--rs-saffron)]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="square" aria-hidden>
+                      <path d="M2.5 8.5 6.5 12.5 13.5 4" />
+                    </svg>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="rs-flag-paths">
+            <p className="rs-small text-[13px] text-[var(--rs-saffron)] sm:col-span-2">Which one is yours?</p>
+            {flagshipPaths.map((p) => (
+              <a key={p.who} href="#enrol" className="rs-flag-path">
+                <span className="rs-small text-[12px] opacity-80">{p.who}</span>
+                <span className="rs-display mt-1 text-[26px]">{p.name}</span>
+                <span className="mt-1 text-[15px] opacity-85">{p.note}</span>
+                <span className="rs-flag-path-go" aria-hidden>
+                  Ask a counsellor
+                  <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+                    <path d="M2 8h11M9 4l4 4-4 4" />
+                  </svg>
+                </span>
+              </a>
+            ))}
+          </div>
+        </article>
+      </div>
+
+      {/* ---- the stage stack (full bleed) ---- */}
+      <div ref={stackRef} className="rs-stack" role="group" aria-label="Programmes by stage">
+        {stages.map((st, i) => (
+          <StageCard key={st.id} stage={st} index={i} total={stages.length} />
+        ))}
+      </div>
+
+      <p className="mx-auto max-w-[var(--rs-max)] px-7 py-16 text-center text-base text-[var(--rs-deep)]/80">
+        Fees depend on the programme and the mode. A counsellor will share the current fees and the next start date.{" "}
+        <a href="#enrol" className="rs-prog-link !inline-flex">Talk to a counsellor</a>
+      </p>
+    </section>
+  );
+}

@@ -1,0 +1,215 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
+// "Your preparation can begin today": the free-resources bento from teammate Sharon's iteration
+// (vajiram-ravi-sharon.vercel.app, #resources), rebuilt in the /v5 language: rust / saffron / cream
+// tiles, Martel uppercase headings, Hindi pills, dotted rules and Indian line icons. Her soft cursor
+// spotlight is kept; tiles pop in like the rest of v5. The current-affairs feed lists V&R's own free
+// resources (domain notes) instead of dated headlines, and carries today's date.
+// Links are "#" until the resource pages exist (same as the footer's resource links).
+
+type Icon = "patrika" | "pothi" | "kalam" | "yantra" | "rehal";
+
+const icons: Record<Icon, React.ReactNode> = {
+  // a patrika with a Devanagari-style masthead and the chakra
+  patrika: (
+    <>
+      <rect x="11" y="13" width="35" height="39" rx="4" />
+      <path d="M46 21h6v25a6 6 0 0 1-6 6" />
+      <path d="M17 20H40M20 20v5M25 20v4M29 20v5M34 20v4M38 20v5" />
+      <circle className="rs-res-acc" cx="23" cy="36" r="6" />
+      <path d="M23 30v12M17 36h12M18.8 31.8l8.4 8.4M27.2 31.8l-8.4 8.4" />
+      <path d="M33 32h8M33 36h8M33 40h8M17 47h24" />
+    </>
+  ),
+  // palm-leaf pothi tied between wooden covers
+  pothi: (
+    <>
+      <rect className="rs-res-acc" x="8" y="20" width="48" height="6" rx="3" />
+      <rect x="10" y="26" width="44" height="16" rx="2" />
+      <rect className="rs-res-acc" x="8" y="42" width="48" height="6" rx="3" />
+      <path d="M15 31h8M27 31h10M41 31h8M15 37h12M31 37h18" />
+      <path d="M22 20v-6h20v6" />
+      <circle className="rs-res-acc" cx="32" cy="14" r="1.8" />
+    </>
+  ),
+  // reed kalam in a dawat
+  kalam: (
+    <>
+      <path className="rs-res-acc" d="M17 54c0-8 6-12 15-12s15 4 15 12z" />
+      <path d="M26 42v-4h12v4" />
+      <path d="M14 54h36" />
+      <path d="M33 38 49 9M37 39 53 11" />
+      <path d="M49 9l4 2" />
+    </>
+  ),
+  // Jantar Mantar's stepped sundial
+  yantra: (
+    <>
+      <path d="M8 52H56" />
+      <path className="rs-res-acc" d="M12 52V47H17V42H22V37H27V32H32V27H37V22H40V52Z" />
+      <path d="M40 14V22" />
+      <path d="M54 52A14 14 0 0 0 40 38" />
+      <circle cx="18" cy="17" r="4" />
+      <path d="M18 8.5v2M18 23.5v2M9.5 17h2M24.5 17h2" />
+    </>
+  ),
+  // an open granth on a rehal stand
+  rehal: (
+    <>
+      <path d="M32 21c-5-3-13-4-20-3v20c7-1 15 0 20 3 5-3 13-4 20-3V18c-7-1-15 0-20 3z" />
+      <path d="M32 21v20" />
+      <path d="M17 25h9M17 30h9M38 30h9M38 35h7" />
+      <path d="M12 38 36 55M52 38 28 55" />
+    </>
+  ),
+};
+
+const feed = [
+  { tag: "Daily", name: "Editorial Analysis", text: "The day's editorials, read the way UPSC asks." },
+  { tag: "Prelims", name: "Prelims Pointers", text: "Current affairs in short points for revision." },
+  { tag: "Mains", name: "Mains Articles", text: "Issue-based articles for GS answer writing." },
+  { tag: "Notes", name: "UPSC Quest Notes", text: "Free study notes, topic by topic." },
+];
+
+const STAGES = ["Notification", "Prelims", "Mains", "Interview"];
+
+function Tile({ tone, className = "", icon, pill, hi, title, text, cta, children }: { tone: "saffron" | "rust" | "cream" | "white" | "orange"; className?: string; icon?: Icon; pill: string; hi: string; title: string; text: string; cta: string; children?: React.ReactNode }) {
+  return (
+    <a
+      href="#"
+      data-pop=""
+      className={`rs-res-tile rs-res-tile--${tone} ${className}`}
+      onPointerMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        e.currentTarget.style.setProperty("--sx", `${e.clientX - r.left}px`);
+        e.currentTarget.style.setProperty("--sy", `${e.clientY - r.top}px`);
+      }}
+    >
+      {icon && (
+        <svg className="rs-res-icon" viewBox="0 0 64 64" aria-hidden>
+          {icons[icon]}
+        </svg>
+      )}
+      <span className="rs-res-pill">
+        {pill}{" "}
+        <i lang="hi" className="rs-hi">
+          {hi}
+        </i>
+      </span>
+      {children}
+      <h3 className="rs-display rs-res-title">{title}</h3>
+      <p className="rs-res-text">{text}</p>
+      <span className="rs-res-cta">{cta} →</span>
+    </a>
+  );
+}
+
+export default function RecipeResources() {
+  const rootRef = useRef<HTMLElement>(null);
+  const [today, setToday] = useState("");
+  const [hi, setHi] = useState(0);
+
+  useEffect(() => {
+    // today's date is client-only (keeps the static export stable)
+    const d = new Date();
+    const id = requestAnimationFrame(() => setToday(d.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })));
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // the feed highlights one resource after another
+    const t = reduce ? 0 : window.setInterval(() => setHi((n) => (n + 1) % feed.length), 2400);
+    const ctx = gsap.context(() => {
+      if (reduce) return;
+      gsap.fromTo("[data-cal-line]", { scaleX: 0 }, { scaleX: 1, ease: "none", scrollTrigger: { trigger: "[data-cal]", start: "top 85%", end: "top 45%", scrub: true } });
+      gsap.from("[data-cal-dot]", { scale: 0, duration: 0.5, ease: "back.out(2)", stagger: 0.15, scrollTrigger: { trigger: "[data-cal]", start: "top 75%" } });
+    }, rootRef);
+    return () => {
+      cancelAnimationFrame(id);
+      if (t) window.clearInterval(t);
+      ctx.revert();
+    };
+  }, []);
+
+  return (
+    <section ref={rootRef} id="resources" className="relative overflow-hidden bg-[#f9e6c4] px-5 py-28 text-[var(--rs-deep)] sm:px-7">
+      <div className="relative mx-auto max-w-[var(--rs-max)]">
+        <div className="grid gap-6 md:grid-cols-[1.3fr_1fr] md:items-end">
+          <div>
+            <p data-pop="" className="rs-small text-[14px] text-[var(--rs-rust)]">
+              Free resources · <span lang="hi" className="rs-hi normal-case">निःशुल्क संसाधन</span>
+            </p>
+            <h2 data-pop="" className="rs-display mt-4 text-[clamp(44px,5.6vw,96px)]">
+              Your preparation
+              <br />
+              can <span className="text-[var(--rs-orange)]">begin today</span>
+            </h2>
+          </div>
+          <p data-pop="" className="max-w-[460px] text-xl leading-snug text-[var(--rs-deep)]/75">
+            Daily current affairs, a monthly magazine and the official papers. Free, from the Vajiram &amp; Ravi editorial desk.
+          </p>
+        </div>
+
+        <div className="rs-res-grid mt-14">
+          {/* current affairs: wide, with today's date and the live feed */}
+          <Tile tone="saffron" className="rs-res-wide" icon="patrika" pill="Updated daily" hi="दैनिक" title="Current affairs" text="Prelims, Mains and Quest articles, written the way UPSC asks." cta="Read today's articles">
+            <div className="rs-res-feed">
+              <p className="rs-small text-[11px] opacity-70">{today ? `Today · ${today}` : "Today"}</p>
+              <ul className="mt-2">
+                {feed.map((f, i) => (
+                  <li key={f.name} className={i === hi ? "is-on" : ""}>
+                    <span className="rs-res-tag">{f.tag}</span>
+                    <span className="min-w-0">
+                      <b>{f.name}</b>
+                      <small>{f.text}</small>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Tile>
+
+          {/* The Recitals: a fanned stack of magazine covers */}
+          <Tile tone="rust" pill="Monthly" hi="मासिक" title="The Recitals" text="UPSC current affairs monthly material, free to download." cta="Download this month">
+            <div className="rs-res-mags" aria-hidden>
+              {["#fcb033", "#fef4c7", "#d1570e"].map((c, i) => (
+                <span key={c} style={{ "--c": c, "--i": i } as React.CSSProperties}>
+                  <b>The Recitals</b>
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              ))}
+            </div>
+          </Tile>
+
+          <Tile tone="cream" icon="kalam" pill="Practice" hi="अभ्यास" title="Previous year papers" text="Prelims and Mains papers, with the UPSC answer key." cta="Browse papers" />
+
+          <Tile tone="orange" icon="yantra" pill="Guide" hi="मार्गदर्शिका" title="Syllabus & exam pattern" text="What is asked at each stage, and how it is marked." cta="Read the guide" />
+
+          <Tile tone="cream" icon="rehal" pill="Study material" hi="पुस्तकें" title="GS postal books" text="Printed General Studies material for UPSC preparation." cta="See the books" />
+
+          {/* UPSC calendar: wide, the four stages on a path that draws on scroll */}
+          <Tile tone="white" className="rs-res-wide" pill="Key dates" hi="प्रमुख तिथियाँ" title="UPSC Calendar 2027" text="Every stage date, plus the age limit and eligibility rules." cta="See the calendar">
+            <div data-cal="" className="rs-res-cal">
+              <span data-cal-line="" className="rs-res-cal-line" aria-hidden />
+              <ol>
+                {STAGES.map((s, i) => (
+                  <li key={s}>
+                    <span data-cal-dot="" className="rs-res-cal-dot">
+                      {i + 1}
+                    </span>
+                    <span className="rs-small text-[11px]">{s}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </Tile>
+        </div>
+      </div>
+    </section>
+  );
+}

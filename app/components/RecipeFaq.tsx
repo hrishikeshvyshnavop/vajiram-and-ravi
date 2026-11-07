@@ -1,5 +1,6 @@
 "use client";
 
+import Btn from "./RecipeButton";
 import { useState } from "react";
 
 // FAQ for /v5. Answers use only facts from docs/research/VAJIRAM_RAVI_DOMAIN_OVERVIEW.md and copy
@@ -48,58 +49,90 @@ const faqs: { q: string; hi: string; a: React.ReactNode }[] = [
   },
 ];
 
+const LETTERS = ["A", "B", "C", "D"] as const;
+// the "correct" bubble of each question: a fixed pattern, so the sheet looks like a real key
+const KEY = [1, 3, 0, 2, 1, 0, 3, 2];
+
 export default function RecipeFaq() {
   const [open, setOpen] = useState<number | null>(0);
 
+  // FAQ rebuilt as the OMR answer sheet from the "Why aspirants trust us" section (user 2026-11-07), on its own rust ground (it used to
+  // sit on the footer's saffron). Each question is a row; opening it "marks" the key bubble in graphite and prints the answer under
+  // the question. Only one is open at a time. The earlier two-column accordion (after davidecarusio.it) was replaced.
   return (
-    <section id="faq" className="relative px-7 pt-28 pb-10 text-[var(--rs-deep)]">
-      <div className="relative mx-auto grid max-w-[1380px] gap-12 md:grid-cols-[1fr_1.4fr] md:gap-16">
-        <div className="md:sticky md:top-28 md:self-start">
-          <p className="rs-small text-[14px] opacity-80">
+    <section id="faq" className="rs-faqo">
+      <div className="rs-faqo-wrap">
+        <div className="rs-faqo-head">
+          <p className="rs-faqo-eyebrow">
             FAQ · <span lang="hi" className="rs-hi normal-case">अक्सर पूछे जाने वाले प्रश्न</span>
           </p>
-          <h2 className="rs-display mt-4 text-[clamp(56px,7vw,112px)]">
-            Questions,
-            <br />
-            answered
-          </h2>
-          <p className="mt-6 max-w-[400px] text-xl leading-snug text-[var(--rs-deep)]/80">
-            What aspirants ask us most before they start. Still unsure? A counsellor will talk it through with you, free.
-          </p>
-          <a href="#enrol" className="rs-pill mt-8 !bg-[var(--rs-deep)] !text-[var(--rs-saffron)]">
-            Ask a counsellor
-          </a>
+          <h2 className="rs-faqo-title">The questions aspirants ask most.</h2>
         </div>
 
-        <ul className="flex flex-col gap-3">
-          {faqs.map((f, i) => {
-            const on = open === i;
-            const id = `rs-faq-${i}`;
-            return (
-              <li key={f.q} className={`rounded-2xl transition-colors duration-300 ${on ? "bg-[var(--rs-deep)] text-[var(--rs-cream)] shadow-[0_24px_48px_-24px_rgba(45,32,29,.7)]" : "bg-[var(--rs-cream)]/45 ring-1 ring-[var(--rs-deep)]/15 backdrop-blur-[2px] hover:bg-[var(--rs-cream)]/70"}`}>
-                <h3>
-                  <button type="button" className="flex w-full items-start gap-5 p-6 text-left" aria-expanded={on} aria-controls={id} onClick={() => setOpen(on ? null : i)}>
-                    <span className="rs-small mt-1.5 shrink-0 text-[12px] opacity-60">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="flex-1">
-                      <span className="block text-[clamp(18px,1.6vw,22px)] leading-snug font-semibold">{f.q}</span>
-                      <span lang="hi" className="rs-hi mt-1 block text-[14px] opacity-60">
-                        {f.hi}
+        <div className="rs-omr rs-faqo-sheet">
+          <div className="rs-omr-head">
+            <div>
+              <p className="rs-omr-title">OMR Answer Sheet</p>
+              <p className="rs-omr-sub">
+                Civil Services aspirants · Paper: <b>Frequently asked questions</b> ·{" "}
+                <span lang="hi" className="rs-hi">उत्तर पत्रक</span>
+              </p>
+            </div>
+            <p className="rs-omr-note">Tap a question · Its answer is marked</p>
+          </div>
+
+          <ul className="rs-faqo-qs">
+            {faqs.map((f, i) => {
+              const on = open === i;
+              const id = `rs-faq-${i}`;
+              return (
+                <li key={f.q} className={`rs-faqo-q ${on ? "is-open" : ""}`}>
+                  <h3>
+                    <button type="button" className="rs-faqo-btn" aria-expanded={on} aria-controls={id} onClick={() => setOpen(on ? null : i)}>
+                      <span className="rs-omr-qno">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="rs-faqo-qtext">
+                        <span className="rs-omr-qtext">{f.q}</span>
+                        <span lang="hi" className="rs-hi rs-faqo-hi">{f.hi}</span>
                       </span>
-                    </span>
-                    <span className={`mt-1 grid size-8 shrink-0 place-items-center rounded-full text-[18px] transition-transform duration-300 ${on ? "rotate-45 bg-[var(--rs-saffron)] text-[var(--rs-deep)]" : "bg-[var(--rs-deep)] text-[var(--rs-saffron)]"}`} aria-hidden>
-                      +
-                    </span>
-                  </button>
-                </h3>
-                <div id={id} role="region" className={`grid transition-[grid-template-rows] duration-400 ease-out ${on ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-                  <div className="overflow-hidden">
-                    <p className="max-w-[640px] px-6 pb-7 pl-[68px] text-[16px] leading-relaxed">{f.a}</p>
+                      <span className="rs-omr-opts" aria-hidden>
+                        {LETTERS.map((l, k) => (
+                          <span key={l} className="rs-omr-bubble">
+                            <i>{l}</i>
+                            {on && k === KEY[i] && <b className="rs-omr-fill" />}
+                          </span>
+                        ))}
+                      </span>
+                    </button>
+                  </h3>
+                  <div id={id} role="region" className={`grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] ${on ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                    <div className="overflow-hidden">
+                      <p className="rs-faqo-a">
+                        <span className="rs-faqo-key">Answer {LETTERS[KEY[i]]}</span>
+                        {f.a}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="rs-omr-foot">
+            <div className="rs-omr-office">
+              <p className="rs-omr-label">For office use only</p>
+              <p className="mt-1 text-[13px]">Checked by: V&amp;R counselling desk</p>
+            </div>
+            <p className="rs-omr-note">Fees and dates change each cycle. A counsellor gives the current ones.</p>
+          </div>
+        </div>
+
+        <div className="rs-faqo-more">
+          <p>
+            Have more questions?
+            <span>A counsellor will talk it through with you, free.</span>
+          </p>
+          <Btn href="#enrol" variant="light">Ask a counsellor</Btn>
+        </div>
       </div>
     </section>
   );
