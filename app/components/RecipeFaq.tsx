@@ -1,10 +1,15 @@
 "use client";
 
 import Btn from "./RecipeButton";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 // FAQ for /v5. Answers use only facts from docs/research/VAJIRAM_RAVI_DOMAIN_OVERVIEW.md and copy
 // already on the site; fees and dates are left to the counsellor because they change each cycle.
+//
+// Layout (user 2026-11-09: "FAQ does not look like a FAQ, need another idea"): a classic help-centre page on cream, which is what people
+// recognise as an FAQ. Left: the plain title "Frequently asked questions", a search box, category filters and a "still have a question?" card.
+// Right: the questions as rows with a Q badge and a + that opens the answer under an A badge. The OMR answer-sheet version is in
+// apps/my-app/backup/removed-sections/RecipeFaq.omr.tsx.bak.
 
 const faqs: { q: string; hi: string; a: React.ReactNode }[] = [
   {
@@ -49,89 +54,96 @@ const faqs: { q: string; hi: string; a: React.ReactNode }[] = [
   },
 ];
 
-const LETTERS = ["A", "B", "C", "D"] as const;
-// the "correct" bubble of each question: a fixed pattern, so the sheet looks like a real key
-const KEY = [1, 3, 0, 2, 1, 0, 3, 2];
+
+// which group each question belongs to, by position in the list above
+const GROUPS = ["The exam", "Courses and study", "Fees and centres"] as const;
+type Group = (typeof GROUPS)[number];
+const GROUP_OF: Group[] = ["The exam", "The exam", "Courses and study", "Courses and study", "Courses and study", "Courses and study", "Fees and centres", "Fees and centres"];
 
 export default function RecipeFaq() {
   const [open, setOpen] = useState<number | null>(0);
+  const [group, setGroup] = useState<Group | "All">("All");
+  const [query, setQuery] = useState("");
 
-  // FAQ rebuilt as the OMR answer sheet from the "Why aspirants trust us" section (user 2026-11-07), on its own rust ground (it used to
-  // sit on the footer's saffron). Each question is a row; opening it "marks" the key bubble in graphite and prints the answer under
-  // the question. Only one is open at a time. The earlier two-column accordion (after davidecarusio.it) was replaced.
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return faqs
+      .map((f, i) => ({ f, i }))
+      .filter(({ f, i }) => (group === "All" || GROUP_OF[i] === group) && (!q || `${f.q} ${f.hi} ${String(f.a)}`.toLowerCase().includes(q)));
+  }, [group, query]);
+
+  const count = (g: Group | "All") => (g === "All" ? faqs.length : GROUP_OF.filter((x) => x === g).length);
+
   return (
-    <section id="faq" className="rs-faqo">
-      <div className="rs-faqo-wrap">
-        <div className="rs-faqo-head">
-          <p className="rs-faqo-eyebrow">
-            FAQ · <span lang="hi" className="rs-hi normal-case">अक्सर पूछे जाने वाले प्रश्न</span>
+    <section id="faq" className="rs-fq" aria-labelledby="faq-title">
+      <div className="rs-fq-wrap">
+        <div className="rs-fq-side">
+          <p className="rs-fq-eyebrow">
+            <span className="l-en">FAQ · </span><span lang="hi" className="rs-hi normal-case">अक्सर पूछे जाने वाले प्रश्न</span>
           </p>
-          <h2 className="rs-faqo-title">The questions aspirants ask most.</h2>
-        </div>
+          <h2 id="faq-title" className="rs-fq-title">Frequently asked questions</h2>
+          <p className="rs-fq-lead">Quick answers about the exam, the courses and the centres. Can&apos;t find yours? Ask a counsellor, it&apos;s free.</p>
 
-        <div className="rs-omr rs-faqo-sheet">
-          <div className="rs-omr-head">
-            <div>
-              <p className="rs-omr-title">OMR Answer Sheet</p>
-              <p className="rs-omr-sub">
-                Civil Services aspirants · Paper: <b>Frequently asked questions</b> ·{" "}
-                <span lang="hi" className="rs-hi">उत्तर पत्रक</span>
-              </p>
-            </div>
-            <p className="rs-omr-note">Tap a question · Its answer is marked</p>
+          <div className="rs-fq-search">
+            <label htmlFor="fq-search" className="sr-only">Search the questions</label>
+            <svg viewBox="0 0 20 20" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" aria-hidden>
+              <circle cx="8.5" cy="8.5" r="5.5" />
+              <path d="M13 13l4.5 4.5" />
+            </svg>
+            <input id="fq-search" type="search" placeholder="Search the questions" value={query} onChange={(e) => { setQuery(e.target.value); setOpen(null); }} />
           </div>
 
-          <ul className="rs-faqo-qs">
-            {faqs.map((f, i) => {
+          <div role="group" aria-label="Filter questions by topic" className="rs-fq-cats">
+            {(["All", ...GROUPS] as const).map((g) => (
+              <button key={g} type="button" aria-pressed={g === group} className={g === group ? "is-on" : ""} onClick={() => { setGroup(g); setOpen(null); }}>
+                {g}
+                <span>{count(g)}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="rs-fq-ask">
+            <p>Still have a question?</p>
+            <span>A counsellor will talk it through with you, free. Or call 080-6220-6330.</span>
+            <Btn href="#enrol" variant="ink" size="sm">Ask a counsellor</Btn>
+          </div>
+        </div>
+
+        <div className="rs-fq-main">
+          <ul className="rs-fq-list" aria-live="polite">
+            {shown.map(({ f, i }) => {
               const on = open === i;
-              const id = `rs-faq-${i}`;
+              const id = `rs-fq-${i}`;
               return (
-                <li key={f.q} className={`rs-faqo-q ${on ? "is-open" : ""}`}>
+                <li key={f.q} className={`rs-fq-item ${on ? "is-open" : ""}`}>
                   <h3>
-                    <button type="button" className="rs-faqo-btn" aria-expanded={on} aria-controls={id} onClick={() => setOpen(on ? null : i)}>
-                      <span className="rs-omr-qno">{String(i + 1).padStart(2, "0")}</span>
-                      <span className="rs-faqo-qtext">
-                        <span className="rs-omr-qtext">{f.q}</span>
-                        <span lang="hi" className="rs-hi rs-faqo-hi">{f.hi}</span>
+                    <button type="button" className="rs-fq-btn" aria-expanded={on} aria-controls={id} onClick={() => setOpen(on ? null : i)}>
+                      <span className="rs-fq-badge" aria-hidden>Q</span>
+                      <span className="rs-fq-q">
+                        {f.q}
+                        <span lang="hi" className="rs-hi rs-fq-hi">{f.hi}</span>
                       </span>
-                      <span className="rs-omr-opts" aria-hidden>
-                        {LETTERS.map((l, k) => (
-                          <span key={l} className="rs-omr-bubble">
-                            <i>{l}</i>
-                            {on && k === KEY[i] && <b className="rs-omr-fill" />}
-                          </span>
-                        ))}
-                      </span>
+                      <span className="rs-fq-plus" aria-hidden><i /><i /></span>
                     </button>
                   </h3>
                   <div id={id} role="region" className={`grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] ${on ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
                     <div className="overflow-hidden">
-                      <p className="rs-faqo-a">
-                        <span className="rs-faqo-key">Answer {LETTERS[KEY[i]]}</span>
-                        {f.a}
-                      </p>
+                      <div className="rs-fq-a">
+                        <span className="rs-fq-badge is-a" aria-hidden>A</span>
+                        <p>{f.a}</p>
+                      </div>
                     </div>
                   </div>
                 </li>
               );
             })}
           </ul>
-
-          <div className="rs-omr-foot">
-            <div className="rs-omr-office">
-              <p className="rs-omr-label">For office use only</p>
-              <p className="mt-1 text-[13px]">Checked by: V&amp;R counselling desk</p>
-            </div>
-            <p className="rs-omr-note">Fees and dates change each cycle. A counsellor gives the current ones.</p>
-          </div>
-        </div>
-
-        <div className="rs-faqo-more">
-          <p>
-            Have more questions?
-            <span>A counsellor will talk it through with you, free.</span>
-          </p>
-          <Btn href="#enrol" variant="light">Ask a counsellor</Btn>
+          {shown.length === 0 && (
+            <p className="rs-fq-empty">
+              No question matches &ldquo;{query}&rdquo;. <a href="#enrol">Ask a counsellor</a> and we&apos;ll answer it.
+            </p>
+          )}
+          <p className="rs-fq-note">Fees and dates change each cycle. A counsellor gives the current ones.</p>
         </div>
       </div>
     </section>

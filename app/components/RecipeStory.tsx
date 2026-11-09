@@ -12,11 +12,10 @@ import SectionMotif from "./SectionMotifs";
 import RecipeHeader from "./RecipeHeader";
 import RecipeTrust from "./RecipeTrust";
 import RecipeLedger from "./RecipeLedger";
-import RecipeFacultyTeam from "./RecipeFacultyTeam";
+import RecipeTeam from "./RecipeTeam";
 import RecipeResources from "./RecipeResources";
 import RecipeHeroFaceoff from "./RecipeHeroFaceoff";
 import RecipeBatches from "./RecipeBatches";
-import RecipeContactLocations from "./RecipeContactLocations";
 import RecipeStories from "./RecipeStories";
 import RecipeWhy from "./RecipeWhy";
 import RecipeAbout from "./RecipeAbout";
@@ -342,7 +341,7 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
         <div className="relative mx-auto grid min-h-[100svh] max-w-[calc(var(--rs-max)+56px)] items-center gap-8 px-7 pt-[110px] pb-12 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-4">
           {/* Copy */}
           <div className="relative z-10">
-            <p data-hero-fade="" className="rs-small text-[15px]">
+            <p data-hero-fade="" className="rs-small text-[16px]">
               Vajiram &amp; Ravi · UPSC coaching since 1976
             </p>
             <h1 className="rs-display mt-4 text-[clamp(38px,10.5vw,52px)] leading-[0.92] lg:text-[clamp(52px,6.1vw,104px)]" aria-label="Your UPSC journey starts here: Civil Services preparation">
@@ -357,7 +356,7 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
               ))}
             </h1>
             <div data-hero-fade="" className="rs-dots mt-6 max-w-[560px]" />
-            <p data-hero-fade="" className="rs-display mt-5 text-[clamp(20px,1.9vw,30px)]">
+            <p data-hero-fade="" className="rs-display mt-5 text-[length:var(--rs-t3)]">
               {["IAS", "IPS", "IFS", "and every Civil Service"].map((w, i) => (
                 <span key={w}>
                   {i > 0 && <Sep />}
@@ -365,7 +364,7 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
                 </span>
               ))}
             </p>
-            <p data-hero-fade="" lang="hi" className="rs-hi mt-1 text-[clamp(15px,1.25vw,19px)] opacity-80">
+            <p data-hero-fade="" lang="hi" className="rs-hi mt-1 text-[16px] opacity-80">
               {["सिविल सेवा परीक्षा की तैयारी", "प्रारंभिक", "मुख्य", "साक्षात्कार"].map((w, i) => (
                 <span key={w}>
                   {i > 0 && <Sep />}
@@ -373,7 +372,7 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
                 </span>
               ))}
             </p>
-            <p data-hero-fade="" className="mt-6 max-w-[480px] text-[17px] leading-snug text-[var(--rs-cream)]/85">
+            <p data-hero-fade="" className="mt-6 max-w-[480px] text-[18px] leading-snug text-[var(--rs-cream)]/85">
               One preparation for the UPSC Civil Services Examination, whichever service you aim for. Classroom and online courses, test series and interview guidance, from Prelims to the Personality Test.
             </p>
             <div data-hero-fade="" className="mt-7 flex flex-wrap items-center gap-2">
@@ -386,9 +385,9 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
             </div>
             {/* Proof: the CSE 2025 result */}
             <a data-hero-fade="" href="#toppers" className="mt-8 inline-flex max-w-full items-center gap-4 rounded-2xl bg-[var(--rs-saffron)] py-3 pr-5 pl-4 text-[var(--rs-deep)] transition-transform duration-300 hover:-rotate-1">
-              <span className="rs-display shrink-0 text-[28px] leading-none whitespace-nowrap sm:text-[34px]">AIR 1–10</span>
+              <span className="rs-display shrink-0 text-[28px] leading-none whitespace-nowrap sm:text-[32px]">AIR 1–10</span>
               <span className="text-[14px] leading-snug">
-                <span className="rs-small block text-[11px] opacity-70">UPSC CSE 2025</span>
+                <span className="rs-small block text-[12px] opacity-70">UPSC CSE 2025</span>
                 All ten prepared with Vajiram &amp; Ravi →
               </span>
             </a>
@@ -422,8 +421,9 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
       {/* ---------- meet the toppers: The Aspirant's Chronicle, an old newspaper front page (right after the hero) ---------- */}
       <RecipeToppersPaper toppers={toppers} />
 
-      {/* ---------- learn from the specialists: monument.tv team experience (lanyards kept in RecipeFaculty.tsx) ---------- */}
-      <RecipeFacultyTeam specialists={specialists} entry={teamEntry} look={teamLook} />
+      {/* ---------- learn from the specialists: cards on the Courses design language (user 2026-11-09). The pinned monument.tv team is in
+           RecipeFacultyTeam.tsx and backup/removed-sections. teamEntry / teamLook belonged to that version and no longer change the look. ---------- */}
+      <RecipeTeam specialists={specialists} />
 
       {/* ---------- free resources, straight under the team (user 2026-11-07) ---------- */}
       <RecipeResources />
@@ -434,9 +434,8 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
       {/* ---------- counselling callback strip (storyline section 9); owns the #enrol anchor ---------- */}
       <RecipeCounselling />
 
-      {/* ---------- success stories (10), contact and campus (13, 14); FAQ (12) and the closing call (15) are in the footer ---------- */}
+      {/* ---------- success stories (10); contact and campus (13, 14) is now the second half of the counselling section; FAQ (12) and the closing call (15) are in the footer ---------- */}
       <RecipeStories />
-      <RecipeContactLocations />
 
       {/* ---------- footer: full link set (finalised) ---------- */}
       <RecipeFooter enrolAnchor={false} />
@@ -451,7 +450,7 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
           <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-end">
             <div>
               <p data-pop="" className="rs-small text-[14px] opacity-80">
-                How it works · <span lang="hi" className="rs-hi normal-case">तैयारी कैसे होती है</span>
+                <span className="l-en">How it works · </span><span lang="hi" className="rs-hi normal-case">तैयारी कैसे होती है</span>
               </p>
               <h2 data-pop="" className="rs-display mt-4 text-[clamp(52px,6.6vw,108px)]">
                 One exam,
@@ -469,14 +468,14 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
               <article key={st.name} data-pop="" className="flex flex-col rounded-2xl bg-white p-7 ring-1 ring-[var(--rs-deep)]/10 shadow-[0_18px_40px_-28px_rgba(45,32,29,0.5)]">
                 <div className="flex items-baseline justify-between gap-4">
                   <span className="rs-small text-[12px] opacity-60">Stage {i + 1}</span>
-                  <span lang="hi" className="rs-hi text-[15px] opacity-70">
+                  <span lang="hi" className="rs-hi text-[16px] opacity-70">
                     {st.hi}
                   </span>
                 </div>
-                <h3 className="rs-display mt-3 text-[clamp(34px,3vw,48px)]">{st.name}</h3>
-                <p className="mt-2 text-[15px] leading-snug text-[var(--rs-deep)]/70">{st.exam}</p>
+                <h3 className="rs-display mt-3 text-[length:var(--rs-t2)]">{st.name}</h3>
+                <p className="mt-2 text-[16px] leading-snug text-[var(--rs-deep)]/70">{st.exam}</p>
                 <div className="rs-dots my-6" style={{ "--rs-saffron": "var(--rs-rust)" } as React.CSSProperties} />
-                <p className="rs-small text-[11px] opacity-60">With Vajiram &amp; Ravi</p>
+                <p className="rs-small text-[12px] opacity-60">With Vajiram &amp; Ravi</p>
                 <ul className="mt-3 flex flex-col gap-2.5 text-[16px] leading-snug text-[var(--rs-deep)]/90">
                   {st.give.map((g) => (
                     <li key={g} className="flex gap-2.5">
@@ -490,8 +489,8 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
 
             {/* Course at a glance */}
             <div data-pop="" className="rs-label flex flex-col rounded-2xl p-7">
-              <p className="rs-small text-[11px] opacity-60">Flagship course</p>
-              <p className="rs-display mt-3 text-[clamp(30px,2.6vw,40px)] leading-[0.95]">GS Prelims cum Mains 2027</p>
+              <p className="rs-small text-[12px] opacity-60">Flagship course</p>
+              <p className="rs-display mt-3 text-[length:var(--rs-t2)] leading-[0.95]">GS Prelims cum Mains 2027</p>
               <div className="mt-5">
                 {glance.map((g, i) => (
                   <div key={g.k} className={`rs-label-row ${i === 0 ? "thick" : ""}`}>
@@ -516,14 +515,14 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
           <div className="flex flex-col justify-center gap-10">
             <div>
               <p data-pop="" className="rs-small text-[14px] opacity-80">
-                Our method · <span lang="hi" className="rs-hi normal-case">हमारी पद्धति</span>
+                <span className="l-en">Our method · </span><span lang="hi" className="rs-hi normal-case">हमारी पद्धति</span>
               </p>
               <h2 data-pop="" className="rs-display mt-4 text-[clamp(44px,5vw,80px)] leading-[0.92]">
                 No fillers.
                 <br />
                 No shortcuts.
               </h2>
-              <p data-fill="" className="rs-display mt-3 text-[clamp(30px,3.2vw,52px)] leading-[0.95] text-[var(--rs-deep)]">
+              <p data-fill="" className="rs-display mt-3 text-[length:var(--rs-t2)] leading-[0.95] text-[var(--rs-deep)]">
                 {"Just a plan in every class.".split(" ").map((w, i) => (
                   <span key={i} className="rs-fill-word">
                     {w}{" "}
@@ -559,7 +558,7 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
             </div>
             <figcaption className="relative mt-4 flex items-center justify-between gap-4 text-[14px] font-semibold text-[var(--rs-cream)]">
               <span>A Vajiram &amp; Ravi classroom</span>
-              <span className="rs-small text-[11px] opacity-80">One plan · every class</span>
+              <span className="rs-small text-[12px] opacity-80">One plan · every class</span>
             </figcaption>
           </figure>
         </div>
@@ -586,7 +585,7 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
             {pillars.map((p, i) => (
               <article key={p.title} data-pop="" className="rs-grain relative overflow-hidden rounded-2xl bg-[var(--rs-deep)] p-7 text-[var(--rs-saffron)]">
                 <p className="rs-small opacity-70">0{i + 1}</p>
-                <p className="rs-display mt-10 text-[42px] leading-[0.9]">{p.kicker}</p>
+                <p className="rs-display mt-10 text-[40px] leading-[0.9]">{p.kicker}</p>
                 <div className="rs-dots my-6" />
                 <p className="rs-display text-[22px]">{p.title}</p>
                 <p className="mt-3 leading-snug text-[var(--rs-cream)]/80">{p.text}</p>
@@ -650,7 +649,7 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
                   ))}
                 </div>
                 <h3 className="rs-display mt-6 text-[28px] leading-[0.92]">{p.name}</h3>
-                <p className="mt-3 text-[15px] leading-snug">{p.text}</p>
+                <p className="mt-3 text-[16px] leading-snug">{p.text}</p>
               </article>
             ))}
           </div>
@@ -664,7 +663,7 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
           <div className="grid gap-8 md:grid-cols-[1.25fr_1fr] md:items-end">
             <div>
               <p data-pop="" className="rs-small text-[14px] opacity-80">
-                Your journey with us · <span lang="hi" className="rs-hi normal-case">पहली कॉल से साक्षात्कार बोर्ड तक</span>
+                <span className="l-en">Your journey with us · </span><span lang="hi" className="rs-hi normal-case">पहली कॉल से साक्षात्कार बोर्ड तक</span>
               </p>
               <h2 data-pop="" className="rs-display mt-4 text-[clamp(40px,4.6vw,80px)]">
                 From first call
@@ -697,14 +696,14 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
                         {journeyIcons[j.icon]}
                       </svg>
                     </span>
-                    <span lang="hi" className="rs-hi text-[15px] opacity-70">
+                    <span lang="hi" className="rs-hi text-[16px] opacity-70">
                       {j.hi}
                     </span>
                   </div>
                   <p className="rs-small mt-6 text-[12px] opacity-60">
                     Step {i + 1} · {j.step}
                   </p>
-                  <h3 className="rs-display mt-2 text-[clamp(30px,2.6vw,42px)]">{j.title}</h3>
+                  <h3 className="rs-display mt-2 text-[length:var(--rs-t2)]">{j.title}</h3>
                   <p className="mt-3 text-[16px] leading-snug text-[var(--rs-deep)]/85">{j.text}</p>
                   <div className="rs-dots my-6" style={{ "--rs-saffron": "var(--rs-rust)" } as React.CSSProperties} />
                   <p className="text-[14px] leading-snug text-[var(--rs-deep)]/70">{j.meta}</p>
@@ -731,7 +730,7 @@ function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; tea
         <div className="relative mx-auto grid max-w-[var(--rs-max)] gap-12 md:grid-cols-[1fr_1.05fr] md:items-start">
           <div className="md:sticky md:top-28">
             <p data-pop="" className="rs-small">
-              Admissions for 2027 are open · <span lang="hi" className="rs-hi normal-case">निःशुल्क परामर्श</span>
+              <span className="l-en">Admissions for 2027 are open · </span><span lang="hi" className="rs-hi normal-case">निःशुल्क परामर्श</span>
             </p>
             <h2 data-pop="" className="rs-display mt-4 text-[clamp(52px,7vw,120px)]">
               Talk to a

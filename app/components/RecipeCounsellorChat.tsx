@@ -182,7 +182,7 @@ export default function RecipeCounsellorChat() {
             <span className="size-2 rounded-full bg-[#4ade80]" aria-hidden /> {typing && !done ? "typing…" : "online · replies in English & हिंदी"}
           </p>
         </div>
-        <span className="rs-small hidden text-[10px] opacity-70 sm:inline">Free · no obligation</span>
+        <span className="rs-small hidden text-[12px] opacity-70 sm:inline">Free · no obligation</span>
       </div>
 
       {/* messages */}
@@ -276,7 +276,7 @@ export default function RecipeCounsellorChat() {
         <label htmlFor={`${id}-msg`} className="sr-only">
           {textStep ? current.ask(lead) : "Message"}
         </label>
-        {current?.kind === "tel" && <span className="pl-4 text-[15px] font-semibold opacity-60">+91</span>}
+        {current?.kind === "tel" && <span className="pl-4 text-[16px] font-semibold opacity-60">+91</span>}
         <input
           ref={inputRef}
           id={`${id}-msg`}
@@ -294,7 +294,7 @@ export default function RecipeCounsellorChat() {
           className="min-w-0 flex-1 bg-transparent px-4 text-[16px] outline-none placeholder:text-[var(--rs-deep)]/40 disabled:cursor-not-allowed"
         />
         {textStep && current.optional && !typing && (
-          <button type="button" className="rs-small px-3 text-[11px] opacity-70 hover:opacity-100" onClick={() => answer("")}>
+          <button type="button" className="rs-small px-3 text-[12px] opacity-70 hover:opacity-100" onClick={() => answer("")}>
             Skip
           </button>
         )}

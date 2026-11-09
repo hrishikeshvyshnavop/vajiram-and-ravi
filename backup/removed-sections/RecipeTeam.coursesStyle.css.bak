@@ -1,0 +1,11 @@
+/* ---------- Team on the Courses design language (RecipeTeam.tsx; user 2026-11-09) ----------
+   Inherits every .rs-cs-* rule (paper ground, rules around the headline, framed cards on graph paper, chips). Only the standing figure differs:
+   a portrait in an arch-topped frame on a saffron backing, standing on the card and poking out above it. The old pinned team is in
+   backup/removed-sections/RecipeFacultyTeam.pinned.*.bak; its .rs-team-* rules stay above, unused. */
+.rs-tm-card { padding-top: 70px; }
+.rs-tm-photo { position: absolute; left: 50%; top: 0; z-index: 1; width: 132px; aspect-ratio: 4 / 5; margin: 0; overflow: hidden; border: 2.5px solid var(--rs-deep); border-radius: 66px 66px 12px 12px; background: var(--rs-saffron); transform: translate(-50%, -70px); box-shadow: 0 14px 22px -12px rgba(70, 30, 12, 0.55); }
+.rs-tm-card .rs-cs-in { padding-top: 48px; }
+.rs-tm-card .rs-cs-foot { justify-content: center; padding-top: 28px; }
+.rs-tm-grid { margin-top: 112px; gap: 110px 28px; }
+@media (max-width: 1000px) { .rs-tm-grid { gap: 110px 28px; } }
+@media (max-width: 640px) { .rs-tm-grid { margin-top: 100px; gap: 100px; } }

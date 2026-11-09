@@ -1,0 +1,113 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import Btn from "./RecipeButton";
+import SectionMotif from "./SectionMotifs";
+import type { Specialist } from "./RecipeFacultyTeam";
+
+// Faculty / team section, layout 4 (user 2026-11-09: "you have missing the design language in the faculty section"). A different layout from
+// the Courses cards, but built only from the site's own vocabulary: cream paper with the faint block-print motif, a bilingual eyebrow and a
+// Hanken Grotesk headline, a 24px-rounded saffron stage card with the teacher in an arch-topped frame (the same arch as the mehrab and the
+// milestone), a ruled list of large names like the Contact section's city list, rust for the active row, the square Btn and the pill chips.
+// One featured teacher on the left (their portrait, name, subject and level); the six names on the right pick who is shown (click, tap,
+// hover or the arrow keys). The blackboard version, the Courses-style cards and the pinned monument.tv team are all in backup/removed-sections.
+// Keeps id="faculty" and an opaque ground: RecipeStory's scroll logic (held hero, toppers backdrop) is anchored on #faculty.
+// Only facts already on the page: names, subjects and levels from the specialists list, and "the same faculty in the classroom and LIVE
+// online" from the domain overview. No bios or credentials are invented.
+
+export default function RecipeTeam({ specialists }: { specialists: readonly Specialist[] }) {
+  const [i, setI] = useState(0);
+  const n = specialists.length;
+  const cur = specialists[i];
+  const pad = (k: number) => String(k).padStart(2, "0");
+
+  return (
+    <section id="faculty" className="rs-tl" aria-labelledby="tl-title">
+      <SectionMotif variant="buti" className="!text-black/[0.05]" />
+      <div className="rs-tl-wrap">
+        <header className="rs-tl-head">
+          <p data-pop="" className="rs-tl-eyebrow">
+            <span className="l-en">Faculty · </span><span lang="hi" className="rs-hi normal-case">विषय विशेषज्ञ</span>
+          </p>
+          <h2 id="tl-title" data-pop="" className="rs-tl-title">Learn from the specialists</h2>
+        </header>
+
+        <div data-pop="" className="rs-tl-grid">
+          {/* the featured teacher */}
+          <div id="tl-stage" role="tabpanel" aria-labelledby={`tl-tab-${i}`} className="rs-tl-stage">
+            <div className="rs-tl-frame">
+              {specialists.map((f, k) => (
+                <Image
+                  key={f.img}
+                  src={`/v3/images/faculty/${f.img}.webp`}
+                  alt={k === i ? `${f.name}, ${f.subject} faculty` : ""}
+                  aria-hidden={k === i ? undefined : true}
+                  fill
+                  sizes="(min-width: 1024px) 34vw, 90vw"
+                  className={`rs-tl-img object-cover object-top ${k === i ? "is-on" : ""}`}
+                  priority={k === 0}
+                />
+              ))}
+            </div>
+            <div className="rs-tl-cap">
+              <p className="rs-tl-name">{cur.name}</p>
+              <p className="rs-tl-role">{cur.subject} · {cur.detail}</p>
+            </div>
+            <span className="rs-tl-count" aria-hidden>{pad(i + 1)} / {pad(n)}</span>
+          </div>
+
+          {/* the six names, a ruled list */}
+          <div className="rs-tl-side">
+            <div role="tablist" aria-orientation="vertical" aria-label="Faculty" className="rs-tl-tabs">
+              {specialists.map((f, k) => (
+                <button
+                  key={f.name}
+                  type="button"
+                  role="tab"
+                  id={`tl-tab-${k}`}
+                  aria-selected={k === i}
+                  aria-controls="tl-stage"
+                  tabIndex={k === i ? 0 : -1}
+                  onClick={() => setI(k)}
+                  onMouseEnter={() => setI(k)}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+                      e.preventDefault();
+                      const to = (k + 1) % n;
+                      setI(to);
+                      document.getElementById(`tl-tab-${to}`)?.focus();
+                    }
+                    if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+                      e.preventDefault();
+                      const to = (k + n - 1) % n;
+                      setI(to);
+                      document.getElementById(`tl-tab-${to}`)?.focus();
+                    }
+                  }}
+                  className={`rs-tl-tab ${k === i ? "is-on" : ""}`}
+                >
+                  <span className="rs-tl-no">{pad(k + 1)}</span>
+                  <span className="rs-tl-tname">{f.name}</span>
+                  <span className="rs-tl-trole">
+                    {f.subject}
+                    <small>{f.detail}</small>
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="rs-tl-foot">
+              <span className="rs-tl-chips">
+                <span>Classroom</span>
+                <span>LIVE online</span>
+              </span>
+              <p>The same faculty in both. Want to know who teaches your subject?</p>
+              <Btn href="#enrol" variant="ink">Ask a counsellor</Btn>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

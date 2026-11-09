@@ -146,15 +146,15 @@ export default function RecipeFooter({ enrolAnchor = false }: { enrolAnchor?: bo
                 &amp; Ravi
               </span>
             </Link>
-            <p className="mt-5 text-[15px] leading-relaxed text-[var(--rs-cream)]/90">
+            <p className="mt-5 text-[16px] leading-relaxed text-[var(--rs-cream)]/90">
               1-B/7, Pusa Road, Old Rajinder Nagar, New Delhi – 110060. Next to Gate 5, Karol Bagh Metro.
               <br />
               Egmore, Chennai.
             </p>
-            <p className="mt-3 text-[15px] text-[var(--rs-cream)]/90">Mon – Sat, 9 AM – 7 PM</p>
+            <p className="mt-3 text-[16px] text-[var(--rs-cream)]/90">Mon – Sat, 9 AM – 7 PM</p>
             <form onSubmit={(e) => e.preventDefault()} className="mt-6">
               {/* TODO: connect to the client's mailing list; until then submitting does nothing. */}
-              <label htmlFor="rs-news" className="rs-small block text-[11px] text-[var(--rs-saffron)]">
+              <label htmlFor="rs-news" className="rs-small block text-[12px] text-[var(--rs-saffron)]">
                 Get exam updates
               </label>
               <div className="mt-2 flex h-12 items-center bg-white/10 pr-1.5 pl-4 ring-1 ring-white/25 focus-within:ring-2 focus-within:ring-[var(--rs-saffron)]">
@@ -188,7 +188,7 @@ export default function RecipeFooter({ enrolAnchor = false }: { enrolAnchor?: bo
                   <ul id={listId} className={`${isOpen ? "block" : "hidden"} space-y-2.5 pb-5 md:mt-4 md:block md:pb-0`}>
                     {col.links.map((l) => (
                       <li key={l.label}>
-                        <FLink item={l} className="text-[15px] leading-snug text-[var(--rs-cream)]/90" />
+                        <FLink item={l} className="text-[16px] leading-snug text-[var(--rs-cream)]/90" />
                       </li>
                     ))}
                   </ul>
@@ -207,7 +207,7 @@ export default function RecipeFooter({ enrolAnchor = false }: { enrolAnchor?: bo
                 <FLink item={l} className="text-[13px] text-[var(--rs-cream)]/80" />
               </li>
             ))}
-            <li lang="hi" className="rs-hi text-[15px] text-[var(--rs-saffron)]">
+            <li lang="hi" className="rs-hi text-[16px] text-[var(--rs-saffron)]">
               जय हिन्द
             </li>
           </ul>

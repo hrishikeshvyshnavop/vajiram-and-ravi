@@ -1,9 +1,11 @@
 "use client";
 
 import Btn from "./RecipeButton";
+import ContactMap from "./ContactMap";
 import { useEffect, useRef, useState } from "react";
 
-// Counselling callback strip (storyline section 9: docs/STORYLINE_HOMEPAGE.md).
+// Counselling callback strip (storyline section 9: docs/STORYLINE_HOMEPAGE.md), now merged with Contact and campus (user 2026-11-09):
+// the form first, then the campuses and the ways to reach us on a dotted map of India on white (ContactMap.tsx).
 //   "I'd like to ask someone."  ->  the human fallback: name, mobile and a preferred time, nothing more to fill in.
 // It owns the #enrol anchor, so every "Enrol for 2027" / "Talk to a counsellor" button on the page lands here.
 //
@@ -130,7 +132,7 @@ export default function RecipeCounselling() {
     <section id="enrol" className="rs-cbb" aria-labelledby="cb-title">
       <div className="rs-cbb-wrap">
         <p data-pop="" className="rs-cbb-eyebrow">
-          Free counselling · <span lang="hi" className="rs-hi normal-case">निःशुल्क परामर्श</span>
+          <span className="l-en">Free counselling · </span><span lang="hi" className="rs-hi normal-case">निःशुल्क परामर्श</span>
         </p>
         <h2 id="cb-title" data-pop="" className="rs-cbb-title">Talk to a counsellor</h2>
         <p data-pop="" className="rs-cbb-lead">
@@ -156,20 +158,24 @@ export default function RecipeCounselling() {
             </div>
           ) : (
             <form onSubmit={onSubmit} noValidate aria-describedby={SHOW_DEMO_NOTE ? "cb-demo" : undefined}>
+              <div className="rs-slip-formhead">
+                <p className="rs-slip-formtitle">Request a callback</p>
+                <p className="rs-slip-formsub">Fill in the three fields below and a counsellor will call you. It takes about 30 seconds. <span>* required</span></p>
+              </div>
               <div className="rs-cbb-bar">
                 <div className="rs-cbb-field">
-                  <label htmlFor="cb-name">Your name</label>
+                  <label htmlFor="cb-name">Your name <span className="rs-req" aria-hidden>*</span></label>
                   <input ref={nameRef} id="cb-name" name="name" autoComplete="name" placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!errors.name} aria-describedby={errors.name ? "cb-name-err" : undefined} />
                 </div>
                 <div className="rs-cbb-field">
-                  <label htmlFor="cb-phone">Mobile number</label>
+                  <label htmlFor="cb-phone">Mobile number <span className="rs-req" aria-hidden>*</span></label>
                   <div className="rs-cbb-phone">
                     <span aria-hidden>+91</span>
                     <input ref={phoneRef} id="cb-phone" name="phone" type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} placeholder="10-digit number" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "cb-phone-err" : undefined} />
                   </div>
                 </div>
                 <div className="rs-cbb-field">
-                  <label htmlFor="cb-time">Best time to call</label>
+                  <label htmlFor="cb-time">Best time to call <span className="rs-req" aria-hidden>*</span></label>
                   <select id="cb-time" name="time" value={time} onChange={(e) => setTime(e.target.value)} aria-invalid={!!errors.time}>
                     <option value="">Choose a slot</option>
                     {TIMES.map((t) => (
@@ -177,7 +183,7 @@ export default function RecipeCounselling() {
                     ))}
                   </select>
                 </div>
-                <Btn type="submit" variant="ink" disabled={status === "sending"} className="rs-cbb-go">{status === "sending" ? "Sending…" : "Request a call"}</Btn>
+                <Btn type="submit" variant="ink" disabled={status === "sending"} className="rs-cbb-go">{status === "sending" ? "Sending…" : "Request my call"}</Btn>
               </div>
 
               {(errors.name || errors.phone || errors.time) && (
@@ -220,6 +226,16 @@ export default function RecipeCounselling() {
               <span>Mon – Sat, 9 AM – 7 PM</span>
             </p>
           </aside>
+        </div>
+
+        {/* merged in (user 2026-11-09): the old Contact and campus section, as the second half of this one, now a dotted map on white. id="visit" keeps that anchor. */}
+        <div id="visit" className="rs-cbb-visit">
+          <p data-pop="" className="rs-cbb-visit-eyebrow">
+            <span className="l-en">Contact and campus · </span><span lang="hi" className="rs-hi normal-case">संपर्क</span>
+          </p>
+          <h3 data-pop="" className="rs-cbb-visit-title">Or visit us, call us or write</h3>
+          <p data-pop="" className="rs-cbb-visit-lead">Pick the channel that suits you, or come to New Delhi or Chennai.</p>
+          <ContactMap />
         </div>
       </div>
     </section>

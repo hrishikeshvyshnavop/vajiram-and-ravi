@@ -1,0 +1,60 @@
+import Image from "next/image";
+import Btn from "./RecipeButton";
+import type { Specialist } from "./RecipeFacultyTeam";
+
+// Faculty / team section, layout 3 (user 2026-11-09: "the layout looks similar, show another layout for the teams section").
+// The classroom blackboard: a dark slate board in a rust frame, the six teachers pinned on it as slightly tilted polaroids held by tape,
+// the name handwritten on each photo's border, and a chalk label (subject and level) under each. Hovering or focusing straightens and lifts a
+// photo. Handwriting is Kalam (--rs-hand), the face the ledger section already uses. Not a card grid, so it no longer echoes Courses.
+// Earlier versions: the pinned monument.tv team (RecipeFacultyTeam.tsx, backup/removed-sections/RecipeFacultyTeam.pinned.*.bak) and the
+// Courses-style cards (backup/removed-sections/RecipeTeam.coursesStyle.*.bak).
+// Keeps id="faculty" and an opaque ground: RecipeStory's scroll logic (held hero, toppers backdrop) is anchored on #faculty.
+// Only facts already on the page: names, subjects and levels from the specialists list, and "the same faculty in the classroom and LIVE
+// online" from the domain overview. No bios or credentials are invented.
+
+const TILT = [-2.6, 1.8, -1.2, 2.4, -2, 1.4]; // degrees, one per teacher
+
+export default function RecipeTeam({ specialists }: { specialists: readonly Specialist[] }) {
+  return (
+    <section id="faculty" className="rs-tb" aria-labelledby="tb-title">
+      <div className="rs-tb-wrap">
+        <header className="rs-tb-head">
+          <p data-pop="" className="rs-tb-eyebrow">
+            <span className="l-en">Faculty · </span><span lang="hi" className="rs-hi normal-case">विषय विशेषज्ञ</span>
+          </p>
+          <h2 id="tb-title" data-pop="" className="rs-tb-title">Learn from the specialists</h2>
+        </header>
+
+        <div data-pop="" className="rs-tb-board">
+          <div className="rs-tb-chalk-top">
+            <p>Your faculty</p>
+            <span>{specialists.length} specialists · Classroom &amp; LIVE online</span>
+          </div>
+
+          <ul className="rs-tb-grid">
+            {specialists.map((f, i) => (
+              <li key={f.name} className="rs-tb-item" style={{ "--r": `${TILT[i % TILT.length]}deg` } as React.CSSProperties}>
+                <figure className="rs-tb-polaroid" tabIndex={0}>
+                  <span className="rs-tb-tape" aria-hidden />
+                  <div className="rs-tb-photo">
+                    <Image src={`/v3/images/faculty/${f.img}.webp`} alt={`${f.name}, ${f.subject} faculty`} fill sizes="(min-width: 1024px) 22vw, 44vw" className="object-cover object-top" priority={i < 3} />
+                  </div>
+                  <figcaption>{f.name}</figcaption>
+                </figure>
+                <p className="rs-tb-label">
+                  {f.subject}
+                  <small>{f.detail}</small>
+                </p>
+              </li>
+            ))}
+          </ul>
+
+          <div className="rs-tb-foot">
+            <p>Same faculty in the classroom and LIVE online.</p>
+            <Btn href="#enrol" variant="light">Ask a counsellor</Btn>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

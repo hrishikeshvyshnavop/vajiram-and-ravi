@@ -1,0 +1,36 @@
+/* ---------- Team, layout 3: the classroom blackboard (RecipeTeam.tsx; user 2026-11-09: "the layout looks similar, show another layout") ----------
+   Slate board in a rust frame, polaroid portraits pinned with tape at small tilts, names in handwriting, chalk labels. Replaces the Courses-style
+   cards (.rs-tm-* in backup/removed-sections/RecipeTeam.coursesStyle.css.bak). Opaque ground: RecipeStory's scroll logic is anchored on #faculty. */
+.rs-tb { position: relative; z-index: 2; overflow: hidden; padding: var(--rs-sec-pad, 110px) 0; background: radial-gradient(ellipse at center, #fef8ec 0%, #fbf0d8 65%, #f2e3bf 100%); color: var(--rs-deep); }
+.rs-tb::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: url(/grain.png) repeat; background-size: 200px; opacity: 0.09; }
+.rs-tb-wrap { position: relative; z-index: 1; max-width: 1320px; margin: 0 auto; padding: 0 28px; }
+.rs-tb-eyebrow { margin: 0; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rs-rust); }
+.rs-tb-title { margin: 22px 0 0; font-family: var(--rs-body), sans-serif; font-weight: 700; letter-spacing: -0.03em; line-height: 1; font-size: var(--rs-h2); }
+.rs-tb-board { position: relative; margin-top: 56px; padding: 38px 40px 34px; border: 14px solid var(--rs-rust); border-radius: 22px; color: #f4efe3;
+  background:
+    radial-gradient(ellipse 60% 40% at 18% 12%, rgba(255, 255, 255, 0.07), transparent 70%),
+    radial-gradient(ellipse 50% 35% at 82% 88%, rgba(255, 255, 255, 0.06), transparent 70%),
+    #2a1f1a;
+  box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.35), inset 0 0 60px rgba(0, 0, 0, 0.55), 0 30px 50px -28px rgba(70, 30, 12, 0.6); }
+.rs-tb-board::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: 8px; background: url(/grain.png) repeat; background-size: 200px; opacity: 0.1; mix-blend-mode: screen; }
+.rs-tb-chalk-top { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; padding-bottom: 14px; border-bottom: 2px dashed rgba(244, 239, 227, 0.4); }
+.rs-tb-chalk-top p { margin: 0; font-family: var(--rs-hand), cursive; font-weight: 700; font-size: clamp(30px, 3.4vw, 52px); line-height: 1; }
+.rs-tb-chalk-top span { font-family: var(--rs-hand), cursive; font-size: 20px; color: var(--rs-saffron); }
+.rs-tb-grid { position: relative; z-index: 1; list-style: none; margin: 0; padding: 44px 0 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 54px 40px; }
+.rs-tb-item { --r: 0deg; display: flex; flex-direction: column; align-items: center; }
+.rs-tb-polaroid { position: relative; width: min(100%, 290px); margin: 0; padding: 12px 12px 14px; background: #fff7e4; color: var(--rs-deep); border-radius: 3px; box-shadow: 0 16px 26px -10px rgba(0, 0, 0, 0.7); transform: rotate(var(--r)); transform-origin: 50% 0; transition: transform 0.35s cubic-bezier(0.22, 0.9, 0.3, 1.2), box-shadow 0.35s ease; outline: none; }
+.rs-tb-polaroid:hover, .rs-tb-polaroid:focus-visible { transform: rotate(0deg) translateY(-8px) scale(1.03); box-shadow: 0 26px 34px -12px rgba(0, 0, 0, 0.75); z-index: 2; }
+.rs-tb-polaroid:focus-visible { outline: 3px solid var(--rs-saffron); outline-offset: 4px; }
+.rs-tb-tape { position: absolute; left: 50%; top: -13px; width: 74px; height: 26px; margin-left: -37px; background: rgba(252, 176, 51, 0.85); transform: rotate(calc(var(--r) * -1.5)); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); clip-path: polygon(0 8%, 6% 0, 12% 10%, 18% 0, 24% 8%, 100% 8%, 100% 92%, 94% 100%, 88% 90%, 82% 100%, 76% 92%, 0 92%); }
+.rs-tb-photo { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #efdcc0; }
+.rs-tb-polaroid figcaption { padding-top: 10px; text-align: center; font-family: var(--rs-hand), cursive; font-weight: 700; font-size: 24px; line-height: 1.1; color: var(--rs-deep); }
+.rs-tb-label { margin: 18px 0 0; text-align: center; font-family: var(--rs-hand), cursive; font-size: 24px; line-height: 1.1; color: #f4efe3; }
+.rs-tb-label small { display: block; margin-top: 4px; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rs-saffron); }
+.rs-tb-foot { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; margin-top: 30px; padding-top: 22px; border-top: 2px dashed rgba(244, 239, 227, 0.4); }
+.rs-tb-foot p { margin: 0; font-family: var(--rs-hand), cursive; font-size: 24px; color: #f4efe3; }
+@media (max-width: 1000px) { .rs-tb-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .rs-tb-board { padding: 26px 18px 24px; border-width: 10px; }
+  .rs-tb-grid { grid-template-columns: 1fr; gap: 44px; padding-top: 34px; }
+}
+@media (prefers-reduced-motion: reduce) { .rs-tb-polaroid { transition: none; } }

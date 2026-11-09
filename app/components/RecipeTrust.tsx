@@ -93,7 +93,7 @@ export default function RecipeTrust() {
       <div className="relative mx-auto max-w-[var(--rs-max)]">
         <div className="text-center">
           <p data-pop="" className="rs-small text-[14px] opacity-80">
-            The V&amp;R difference · <span lang="hi" className="rs-hi normal-case">वी एंड आर की पहचान</span>
+            <span className="l-en">The V&amp;R difference · </span><span lang="hi" className="rs-hi normal-case">वी एंड आर की पहचान</span>
           </p>
           <h2 data-pop="" className="rs-display mt-4 text-[clamp(52px,7vw,116px)]">
             Why aspirants

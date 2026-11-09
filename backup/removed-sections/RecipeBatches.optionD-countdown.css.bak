@@ -1,0 +1,35 @@
+/* ---------- Next batches, option D: a countdown (user 2026-11-07: "still need another idea to show Admissions open 2027") ----------
+   One big panel counts down to the next batch start (days, hours, minutes, seconds); the other batches follow on a timeline as
+   "Then +N days". Options A (cards), B (departures board) and C (wall calendar) are in apps/my-app/backup/removed-sections/RecipeBatches.option*.bak. */
+.rs-cd { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 40px; align-items: start; margin-top: 52px; }
+.rs-cd-hero { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 18px; padding: 40px; border-radius: 28px; background: var(--rs-rust); color: var(--rs-cream); box-shadow: 0 26px 50px -24px rgba(70, 30, 12, 0.6); }
+.rs-cd-hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: url(/grain.png) repeat; background-size: 200px; mix-blend-mode: multiply; opacity: 0.12; }
+.rs-cd-hero > * { position: relative; z-index: 1; }
+.rs-cd-kicker { margin: 0; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rs-saffron); }
+.rs-cd-clock { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.rs-cd-tile { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 6px 12px; border-radius: 14px; background: var(--rs-deep); box-shadow: inset 0 0 0 1px rgba(254, 248, 236, 0.12); position: relative; }
+.rs-cd-tile::after { content: ""; position: absolute; left: 0; right: 0; top: 42%; height: 2px; background: var(--rs-rust); opacity: 0.8; }
+.rs-cd-tile b { font-family: var(--rs-display), sans-serif; font-weight: 700; font-variant-numeric: lining-nums tabular-nums; font-size: clamp(36px, 5vw, 80px); line-height: 1; color: var(--rs-saffron); }
+.rs-cd-tile span { font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(254, 248, 236, 0.7); }
+.rs-cd-date { margin: 6px 0 0; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
+.rs-cd-title { margin: 0; font-family: var(--rs-body), sans-serif; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; font-size: clamp(28px, 3.2vw, 48px); }
+.rs-cd-sum { margin: 0; max-width: 56ch; font-size: 17px; line-height: 1.5; color: rgba(254, 248, 236, 0.85); }
+.rs-cd-hero .rs-bt-track { background: rgba(254, 248, 236, 0.2); }
+.rs-cd-hero .rs-bt-track span { background: var(--rs-saffron); }
+.rs-cd-hero .rs-bt-fast { background: rgba(252, 176, 51, 0.22); color: var(--rs-saffron); }
+.rs-cd-facts { margin: 0; font-size: 14px; font-weight: 600; opacity: 0.8; }
+.rs-cd-go { align-self: flex-start; margin-top: 4px; }
+.rs-cd-after-h { margin: 6px 0 18px; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rs-rust); }
+.rs-cd-line { list-style: none; margin: 0; padding: 0 0 0 22px; position: relative; display: grid; gap: 14px; }
+.rs-cd-line::before { content: ""; position: absolute; left: 6px; top: 12px; bottom: 12px; border-left: 2px dashed rgba(141, 46, 19, 0.5); }
+.rs-cd-stop { position: relative; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 18px 20px; border-radius: 18px; background: #fff7e4; box-shadow: 0 0 0 1.5px rgba(141, 46, 19, 0.18), 0 8px 20px rgba(70, 30, 12, 0.07); }
+.rs-cd-stop.is-flagship { background: var(--rs-saffron); }
+.rs-cd-dot { position: absolute; left: -22px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; background: var(--rs-cream); border: 3px solid var(--rs-rust); }
+.rs-cd-when b { display: block; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.04em; }
+.rs-cd-when small { font-size: 12px; font-weight: 600; opacity: 0.7; }
+.rs-cd-what h4 { margin: 0; font-family: var(--rs-body), sans-serif; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; font-size: 20px; }
+.rs-cd-what p { margin: 4px 0 0; font-size: 13.5px; opacity: 0.8; }
+.rs-cd-reg { grid-column: 2; justify-self: start; margin-top: 8px; }
+@media (max-width: 1000px) { .rs-cd { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .rs-cd-hero { padding: 26px 20px; } .rs-cd-clock { gap: 8px; } .rs-cd-stop { grid-template-columns: 1fr; } .rs-cd-reg { grid-column: 1; } }
+

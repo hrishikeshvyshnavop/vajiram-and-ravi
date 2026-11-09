@@ -1,0 +1,56 @@
+import Image from "next/image";
+import SectionMotif from "./SectionMotifs";
+import type { Specialist } from "./RecipeFacultyTeam";
+
+// Faculty / team section on the design language of the Courses section (user 2026-11-09: "current team section does not work well, back it up
+// and create a teams section based on the design language of the courses section"). It reuses the Courses classes (.rs-cs-*): the eyebrow, the
+// headline between two thin rules, a grid of framed cards (a double outline over graph paper) with a figure standing on the card and poking out
+// above it, a centred name, a short line, a small-caps meta line and a footer of chips. Here the figure is the teacher's portrait in an
+// arch-topped frame (the Indian window / mehrab shape) instead of an illustration. Six specialists, 3 + 3.
+// It keeps id="faculty" and an opaque ground, because RecipeStory's scroll logic (the held hero, the toppers backdrop) is anchored on #faculty.
+// The earlier pinned, scroll-stepped team (monument.tv style) is in RecipeFacultyTeam.tsx and backup/removed-sections/RecipeFacultyTeam.pinned.*.bak.
+// Only facts already on the page: names, subjects and levels from the specialists list; "classroom and LIVE online with the same faculty" is
+// from the domain overview. No bios or credentials are invented.
+
+export default function RecipeTeam({ specialists }: { specialists: readonly Specialist[] }) {
+  return (
+    <section id="faculty" className="rs-cs rs-tm" aria-labelledby="tm-title">
+      <SectionMotif variant="buti" className="!text-black/[0.06]" />
+      <div className="rs-cs-wrap relative">
+        <p data-pop="" className="rs-cs-eyebrow">
+          <span className="l-en">Faculty · </span><span lang="hi" className="rs-hi normal-case">विषय विशेषज्ञ</span>
+        </p>
+        <div data-pop="" className="rs-cs-head">
+          <span aria-hidden />
+          <h2 id="tm-title">Learn from the specialists</h2>
+          <span aria-hidden />
+        </div>
+
+        <ul className="rs-cs-grid rs-tm-grid">
+          {specialists.map((f, i) => (
+            <li key={f.name} data-pop="" className="rs-cs-card rs-cs-card--rust rs-tm-card">
+              <figure className="rs-tm-photo">
+                <Image src={`/v3/images/faculty/${f.img}.webp`} alt={`${f.name}, ${f.subject} faculty`} fill sizes="(min-width: 1024px) 140px, 40vw" className="object-cover object-top" priority={i < 3} />
+              </figure>
+              <div className="rs-cs-in">
+                <h3 className="rs-cs-name">{f.name}</h3>
+                <p className="rs-cs-text">Teaches {f.subject} at Vajiram &amp; Ravi.</p>
+                <p className="rs-cs-meta">{f.subject} · {f.detail}</p>
+                <div className="rs-cs-foot">
+                  <span className="rs-cs-chips">
+                    <span>Classroom</span>
+                    <span>LIVE online</span>
+                  </span>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <p className="rs-cs-note">
+          Want to know who teaches your subject? <a href="#enrol" className="rs-bt-ask">Ask a counsellor</a>
+        </p>
+      </div>
+    </section>
+  );
+}

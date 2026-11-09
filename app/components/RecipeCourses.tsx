@@ -22,6 +22,9 @@ const courses: { title: string; text: string; meta: string; art: Art; tint: Tint
   { title: "Optional Test Series", text: "Tests for your optional subject, written under exam conditions and reviewed.", meta: "Mains · Optional", art: "clock", tint: "deep" },
 ];
 
+// trig results are rounded so the server and the browser print identical numbers (an unrounded last digit differed and caused a hydration warning)
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 const C = { deep: "#2a1710", rust: "#8d2e13", orange: "#d1570e", saffron: "#fcb033", peach: "#f8a06b", cream: "#fef8ec" };
 const S = { stroke: C.deep, strokeWidth: 1.8, strokeLinejoin: "round", strokeLinecap: "round" } as const;
 
@@ -50,7 +53,6 @@ function PaisleyMark({ x, y, k = 1 }: { x: number; y: number; k?: number }) {
 
 /** A small standing illustration (160 x 84), drawn on a ground line at y = 84, built from the site's Indian motifs. */
 function Illus({ art }: { art: Art }) {
-  const spokes = Array.from({ length: 24 }, (_, i) => (i * Math.PI) / 12);
   const petals = Array.from({ length: 12 }, (_, i) => (i * Math.PI) / 6);
   return (
     <svg viewBox="0 0 160 84" className="rs-cs-art" aria-hidden>
@@ -78,38 +80,51 @@ function Illus({ art }: { art: Art }) {
       )}
       {art === "grid" && (
         <>
-          {/* jaali window: a screened arch with a lattice of rounds */}
-          <path d="M38 80V40A42 34 0 0 1 122 40V80Z" fill={C.cream} {...S} />
+          {/* CSAT: reasoning and numbers, a calculator, a bar chart and a pencil */}
+          <rect x="16" y="54" width="9" height="26" rx="1.5" fill={C.peach} {...S} />
+          <rect x="29" y="40" width="9" height="40" rx="1.5" fill={C.orange} {...S} />
+          <rect x="44" y="6" width="62" height="74" rx="8" fill={C.cream} {...S} />
+          <rect x="52" y="14" width="46" height="16" rx="3" fill={C.saffron} {...S} />
+          <path d="M60 22H72M80 22H92" stroke={C.deep} strokeWidth={1.8} strokeLinecap="round" />
           {[0, 1, 2].flatMap((r) =>
-            [0, 1, 2, 3].map((c) => (
-              <circle key={`${r}${c}`} cx={(r % 2 ? 62 : 52) + c * 20 + (r % 2 ? 0 : 6)} cy={38 + r * 15} r="8.5" fill={(r + c) % 2 ? C.saffron : "none"} stroke={C.rust} strokeWidth={1.6} />
-            )),
+            [0, 1, 2].map((c) => <circle key={`${r}${c}`} cx={60 + c * 15} cy={42 + r * 14} r="5" fill={c === 2 ? C.saffron : C.cream} stroke={C.rust} strokeWidth={1.6} />),
           )}
-          <path d="M80 4V10" {...S} />
+          <path d="M120 12L130 14L126 58L122 70L118 58Z" fill={C.saffron} {...S} />
+          <path d="M118 58L122 70L126 58Z" fill={C.deep} {...S} />
+          <path d="M10 80H150" {...S} />
         </>
       )}
       {art === "arch" && (
         <>
-          {/* mehrab: a cusped arch like a durbar doorway, a lotus bud above */}
-          <path d="M30 80V44Q30 34 44 28Q64 20 80 6Q96 20 116 28Q130 34 130 44V80Z" fill={C.saffron} {...S} />
-          <path d="M50 80V52Q52 42 66 36Q74 32 80 24Q86 32 94 36Q108 42 110 52V80Z" fill={C.cream} {...S} />
-          <path d="M80 80V56" stroke={C.rust} strokeWidth={1.8} strokeLinecap="round" strokeDasharray="1 5" />
-          <circle cx="80" cy="46" r="4" fill={C.orange} {...S} />
-          <path d="M20 80H140" {...S} />
+          {/* interview: a candidate facing a board of three across the table, a question in the air */}
+          <path d="M26 6H62a6 6 0 0 1 6 6V22a6 6 0 0 1-6 6H44L36 34V28H26a6 6 0 0 1-6-6V12a6 6 0 0 1 6-6Z" fill={C.cream} {...S} />
+          <path d="M40 13a4 4 0 1 1 5 3.8V19" fill="none" {...S} />
+          <circle cx="45" cy="23" r="1.3" fill={C.deep} />
+          <circle cx="30" cy="44" r="9" fill={C.cream} {...S} />
+          <path d="M12 80C12 62 20 56 30 56C40 56 48 62 48 80Z" fill={C.orange} {...S} />
+          {[88, 110, 132].map((x) => (
+            <g key={x}>
+              <circle cx={x} cy="30" r="8" fill={C.cream} {...S} />
+              <path d={`M${x - 13} 56C${x - 13} 42 ${x - 6} 40 ${x} 40C${x + 6} 40 ${x + 13} 42 ${x + 13} 56Z`} fill={C.saffron} {...S} />
+            </g>
+          ))}
+          <rect x="68" y="56" width="82" height="14" rx="3" fill={C.rust} {...S} />
+          <path d="M8 80H152" {...S} />
         </>
       )}
       {art === "compass" && (
         <>
-          {/* Ashoka chakra: 24 spokes */}
-          <circle cx="80" cy="44" r="36" fill={C.cream} {...S} />
-          <circle cx="80" cy="44" r="29" fill="none" stroke={C.rust} strokeWidth={1.4} />
-          {spokes.map((a, i) => (
-            <path key={i} d={`M${80 + Math.cos(a) * 9} ${44 + Math.sin(a) * 9}L${80 + Math.cos(a) * 27} ${44 + Math.sin(a) * 27}`} stroke={C.rust} strokeWidth={1.5} strokeLinecap="round" />
-          ))}
-          {spokes.map((a, i) => (
-            <circle key={`d${i}`} cx={80 + Math.cos(a + Math.PI / 24) * 32.5} cy={44 + Math.sin(a + Math.PI / 24) * 32.5} r="1.3" fill={C.deep} />
-          ))}
-          <circle cx="80" cy="44" r="7" fill={C.saffron} {...S} />
+          {/* mentorship: a mentor on the higher step reaches down to the learner, the flag of the goal above */}
+          <rect x="20" y="64" width="40" height="16" fill={C.cream} {...S} />
+          <rect x="60" y="48" width="40" height="32" fill={C.peach} {...S} />
+          <rect x="100" y="32" width="40" height="48" fill={C.saffron} {...S} />
+          <circle cx="40" cy="44" r="6" fill={C.cream} {...S} />
+          <path d="M31 64C31 52 35 50 40 50C45 50 49 52 49 64Z" fill={C.orange} {...S} />
+          <circle cx="80" cy="26" r="7.5" fill={C.cream} {...S} />
+          <path d="M69 48C69 34 74 32 80 32C86 32 91 34 91 48Z" fill={C.rust} {...S} />
+          <path d="M70 40L50 50" {...S} />
+          <path d="M120 32V6" {...S} />
+          <path d="M120 6L144 12L120 20Z" fill={C.orange} {...S} />
         </>
       )}
       {art === "pen" && (
@@ -130,7 +145,7 @@ function Illus({ art }: { art: Art }) {
           {/* marigold */}
           <g transform="translate(128 36)">
             {petals.map((a, i) => (
-              <circle key={i} cx={Math.cos(a) * 12} cy={Math.sin(a) * 12} r="6.5" fill={i % 2 ? C.saffron : C.orange} {...S} />
+              <circle key={i} cx={r2(Math.cos(a) * 12)} cy={r2(Math.sin(a) * 12)} r="6.5" fill={i % 2 ? C.saffron : C.orange} {...S} />
             ))}
             <circle r="7" fill={C.rust} {...S} />
           </g>
@@ -139,13 +154,19 @@ function Illus({ art }: { art: Art }) {
       )}
       {art === "clock" && (
         <>
-          {/* ghadi with a scalloped rangoli rim */}
+          {/* optional test series: a subject paper and a stopwatch, a timed test in your own subject */}
+          <rect x="18" y="12" width="68" height="68" rx="4" fill={C.cream} {...S} />
+          <rect x="18" y="12" width="68" height="14" rx="4" fill={C.saffron} {...S} />
+          <path d="M28 38H76M28 48H76M28 58H58" stroke={C.rust} strokeWidth={1.8} strokeLinecap="round" />
+          <rect x="106" y="6" width="12" height="6" rx="2" fill={C.rust} {...S} />
+          <path d="M112 12V22" {...S} />
+          <circle cx="112" cy="52" r="28" fill={C.cream} {...S} />
+          <circle cx="112" cy="52" r="22" fill={C.peach} stroke={C.deep} strokeWidth={1.4} />
           {petals.map((a, i) => (
-            <circle key={i} cx={80 + Math.cos(a) * 31} cy={44 + Math.sin(a) * 31} r="7" fill={i % 2 ? C.saffron : C.peach} {...S} />
+            <path key={i} d={`M${r2(112 + Math.cos(a) * 18)} ${r2(52 + Math.sin(a) * 18)}L${r2(112 + Math.cos(a) * 21)} ${r2(52 + Math.sin(a) * 21)}`} stroke={C.rust} strokeWidth={1.6} strokeLinecap="round" />
           ))}
-          <circle cx="80" cy="44" r="27" fill={C.cream} {...S} />
-          <path d="M80 44V27M80 44L92 51" {...S} />
-          <circle cx="80" cy="44" r="3" fill={C.rust} />
+          <path d="M112 52V36M112 52L122 58" {...S} />
+          <circle cx="112" cy="52" r="3" fill={C.rust} />
         </>
       )}
     </svg>
@@ -158,7 +179,7 @@ export default function RecipeCourses() {
       <SectionMotif variant="buti" className="!text-black/[0.06]" />
       <div className="rs-cs-wrap relative">
         <p data-pop="" className="rs-cs-eyebrow">
-          Courses · <span lang="hi" className="rs-hi normal-case">पाठ्यक्रम</span>
+          <span className="l-en">Courses · </span><span lang="hi" className="rs-hi normal-case">पाठ्यक्रम</span>
         </p>
         <div data-pop="" className="rs-cs-head">
           <span aria-hidden />

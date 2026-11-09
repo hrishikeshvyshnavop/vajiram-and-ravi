@@ -1,15 +1,12 @@
-"use client";
-
-import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-// Success stories (storyline section 10): honest words from students, each with rank, year and programme.
-// Layout after a testimonial slider the user shared (2026-11-07): one large quote at a time on a dark ground, a round
-// black-and-white portrait with a dashed ring under it, a small-caps "NAME . ROLE" line, dashed circular previous / next
-// buttons with an "n/N" counter, and a dust wave along the top edge. There is no audio, so the ring under the portrait shows
-// the rank instead of "LISTEN".
-// Rule from the storyline: ONLY verified students. The two quotes below are the ones on the current homepage
-// (apps/Vajiram-ravi data/toppers.ts); add more only when the client confirms the student and the wording.
+// "Hear from students" (storyline section 10, success stories). Restored from the original homepage design (apps/Vajiram-ravi SuccessStories: "Hear it
+// from our students" + "Honest words from students who prepared with us, in the classroom and LIVE-Online"): quote cards that each show the student's
+// photo with a rank badge and the exam, the quote, the name and the programme. User 2026-11-09: "hear from students is missing in v5 design", and, when asked,
+// "replace the slider". It replaces the single-quote slider ("In their own words", after a testimonial slider the user shared on 2026-11-07), which is in
+// apps/my-app/backup/removed-sections/RecipeStories.slider.tsx.bak.
+// Rule from the storyline: ONLY verified students. The two quotes below are the ones on the current homepage (apps/Vajiram-ravi data/toppers.ts); add more
+// only when the client confirms the student and the wording. (The live site's own testimonial list is empty and its video strip is mentor sessions, not students.)
 
 const stories = [
   {
@@ -30,118 +27,42 @@ const stories = [
   },
 ];
 
-/** A static dust wave: a few thousand dots, dense along a sine crest and thinning out below it. Drawn once, redrawn on resize. */
-function Dust() {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const cv = ref.current!;
-    const draw = () => {
-      const w = cv.clientWidth;
-      const h = cv.clientHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      cv.width = w * dpr;
-      cv.height = h * dpr;
-      const g = cv.getContext("2d")!;
-      g.scale(dpr, dpr);
-      g.clearRect(0, 0, w, h);
-      // small seeded generator so the pattern is the same on every load
-      let seed = 7;
-      const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-      const n = Math.round((w * h) / 90);
-      for (let i = 0; i < n; i++) {
-        const x = rnd() * w;
-        const crest = h * 0.42 + Math.sin(x / w * Math.PI * 2.2 + 0.6) * h * 0.22;
-        const d = Math.abs(rnd() + rnd() - 1) * h * 0.55; // distance from the crest, mostly small
-        const above = rnd() < 0.5;
-        const y = above ? crest - d * 0.35 : crest + d;
-        if (y < 0 || y > h) continue;
-        g.globalAlpha = 0.2 + rnd() * 0.65 * (1 - Math.min(1, d / (h * 0.6)));
-        g.fillStyle = rnd() < 0.18 ? "#d1570e" : "#8d2e13";
-        g.fillRect(x, y, rnd() < 0.15 ? 2 : 1, rnd() < 0.15 ? 2 : 1);
-      }
-    };
-    draw();
-    let t: ReturnType<typeof setTimeout>;
-    const onResize = () => {
-      clearTimeout(t);
-      t = setTimeout(draw, 150);
-    };
-    window.addEventListener("resize", onResize);
-    return () => {
-      clearTimeout(t);
-      window.removeEventListener("resize", onResize);
-    };
-  }, []);
-  return <canvas ref={ref} className="rs-tq-dust" aria-hidden />;
-}
-
 export default function RecipeStories() {
-  const [i, setI] = useState(0);
-  const n = stories.length;
-  const go = useCallback((d: number) => setI((v) => (v + d + n) % n), [n]);
-
   return (
-    <section
-      id="stories"
-      className="rs-tq"
-      aria-roledescription="carousel"
-      aria-label="Success stories"
-      onKeyDown={(e) => {
-        if (e.key === "ArrowLeft") go(-1);
-        if (e.key === "ArrowRight") go(1);
-      }}
-    >
-      <Dust />
+    <section id="stories" className="rs-tq rs-hs" aria-labelledby="hs-title">
       <div className="relative mx-auto max-w-[var(--rs-max)] px-7">
-        <p data-pop="" className="rs-small text-[14px] text-[var(--rs-rust)]">
-          Success stories · <span lang="hi" className="rs-hi normal-case">सफलता की कहानियाँ</span>
+        <p data-pop="" className="rs-hs-eyebrow">
+          <span className="l-en">Success stories · </span><span lang="hi" className="rs-hi normal-case">सफलता की कहानियाँ</span>
         </p>
-        <h2 data-pop="" className="rs-display mt-3 text-[clamp(40px,4.6vw,76px)]">In their own words</h2>
+        <h2 id="hs-title" data-pop="">Hear from students</h2>
+        <p data-pop="" className="rs-hs-lead">Honest words from students who prepared with us, in the classroom and LIVE online.</p>
 
-        <div className="rs-tq-body">
-          <div className="rs-tq-slides" aria-live="polite">
-            {stories.map((s, k) => (
-              <figure key={s.name} className={`rs-tq-slide ${k === i ? "is-on" : ""}`} aria-hidden={k !== i} aria-roledescription="slide" aria-label={`${k + 1} of ${n}`}>
-                <div className="rs-tq-who">
-                  <div className="rs-tq-photo">
-                    <Image src={`/v3/images/toppers-bw/${s.img}.webp`} alt={`${s.name}, AIR ${s.air} in ${s.exam}`} fill sizes="96px" className="object-cover object-top" />
-                  </div>
-                  <div className="rs-tq-ring" aria-hidden>
-                    <b>AIR {s.air}</b>
-                  </div>
-                  <p className="rs-tq-cap" aria-hidden>{s.exam}</p>
+        <ul className="rs-hs-grid">
+          {stories.map((s) => (
+            <li key={s.name} data-pop="">
+              <figure className="rs-hs-card">
+                <div className="rs-hs-photo">
+                  <Image src={`/v3/images/toppers-bw/${s.img}.webp`} alt={`${s.name}, AIR ${s.air} in ${s.exam}`} fill sizes="(min-width: 1024px) 220px, 40vw" className="object-cover object-top" />
+                  <span className="rs-hs-badge">AIR {s.air}</span>
+                  <span className="rs-hs-exam">{s.exam}</span>
                 </div>
-                <div className="min-w-0">
-                  <blockquote className="rs-tq-quote">{s.quote}</blockquote>
-                  <figcaption className="rs-tq-by">
-                    <b>{s.name}</b> · AIR {s.air} · {s.exam}
-                    <span>Took: {s.took}</span>
+                <div className="rs-hs-body">
+                  <svg viewBox="0 0 32 24" className="rs-hs-quote-mark" aria-hidden>
+                    <path d="M0 24V14C0 6 4 1 12 0l1 3C8 4.500 6.500 7 6.500 10H12v14H0Zm18 0V14c0-8 4-13 12-14l1 3c-5 1.500-6.500 4-6.500 7H30v14H18Z" fill="currentColor" />
+                  </svg>
+                  <blockquote>{s.quote}</blockquote>
+                  <figcaption>
+                    <b>{s.name}</b>
+                    <span>{s.took}</span>
                   </figcaption>
                 </div>
               </figure>
-            ))}
-          </div>
+            </li>
+          ))}
+        </ul>
 
-          <div className="rs-tq-ctl">
-            <button type="button" className="rs-tq-btn" onClick={() => go(-1)} aria-label="Previous story">
-              <svg viewBox="0 0 16 16" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" aria-hidden>
-                <path d="M14 8H3M7 4 3 8l4 4" />
-              </svg>
-            </button>
-            <button type="button" className="rs-tq-btn" onClick={() => go(1)} aria-label="Next story">
-              <svg viewBox="0 0 16 16" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" aria-hidden>
-                <path d="M2 8h11M9 4l4 4-4 4" />
-              </svg>
-            </button>
-            <p className="rs-tq-count" aria-hidden>
-              {i + 1}/{n}
-            </p>
-          </div>
-        </div>
-
-        <p className="mt-12 text-base text-[var(--rs-deep)]/80">
-          Want to hear it from someone who has been through it?{" "}
-          <a href="#enrol" className="rs-bt-ask">Ask a counsellor</a>
+        <p className="rs-hs-ask">
+          Want to hear it from someone who has been through it? <a href="#enrol" className="rs-bt-ask">Ask a counsellor</a>
         </p>
       </div>
     </section>

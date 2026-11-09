@@ -189,7 +189,7 @@ export default function RecipeFacultyTeam({ specialists, entry = "plain", look =
         </h2>
 
         <p className="rs-team-kicker">
-          Faculty · <span lang="hi" className="rs-hi normal-case">विषय विशेषज्ञ</span>
+          <span className="l-en">Faculty · </span><span lang="hi" className="rs-hi normal-case">विषय विशेषज्ञ</span>
           <span className="rs-team-kicker-sub">Learn from the specialists</span>
         </p>
 

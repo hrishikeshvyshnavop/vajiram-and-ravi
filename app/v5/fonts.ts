@@ -1,4 +1,4 @@
-import { Anek_Devanagari, Hanken_Grotesk, Kalam, League_Spartan, Old_Standard_TT, Playfair_Display, UnifrakturMaguntia } from "next/font/google";
+import { Anek_Devanagari, Hanken_Grotesk, League_Spartan, Playfair_Display } from "next/font/google";
 
 // eathungrytiger.com look-alikes for small type:
 //   Graphik X Medium (body)              -> Hanken Grotesk
@@ -14,16 +14,11 @@ export const hankenRs = Hanken_Grotesk({ subsets: ["latin"], variable: "--rs-bod
 export const anek = Anek_Devanagari({ subsets: ["latin"], axes: ["wdth"], variable: "--rs-head" });
 export const anekHindi = Anek_Devanagari({ subsets: ["devanagari"], weight: "500", variable: "--rs-hi-font", preload: false });
 
-// "Meet the toppers" as an old newspaper front page (RecipeToppersPaper.tsx): blackletter masthead,
-// high-contrast condensed headlines and a 19th-century newsprint body face.
-export const paperMast = UnifrakturMaguntia({ subsets: ["latin"], weight: "400", variable: "--rs-paper-mast" });
-export const paperHead = Playfair_Display({ subsets: ["latin"], weight: ["700", "900"], style: ["normal", "italic"], variable: "--rs-paper-head" });
-export const paperBody = Old_Standard_TT({ subsets: ["latin"], weight: ["400", "700"], style: ["normal", "italic"], variable: "--rs-paper-body" });
-
-// "Tradition & results" as a bahi-khata ledger (RecipeLedger.tsx): Kalam (Indian Type Foundry) is a
-// handwriting face with matching Latin and Devanagari, for the inked entries.
-export const ledgerHand = Kalam({ subsets: ["latin", "devanagari"], weight: ["400", "700"], variable: "--rs-hand" });
-
+export const paperHead = Playfair_Display({ subsets: ["latin"], weight: "700", variable: "--rs-paper-head" });
 // Headings (2026-11-07): the whole page uses the hero face, Anek (--rs-head), bold and condensed. Martel was removed.
 
-export const recipeFonts = `${spartan.variable} ${hankenRs.variable} ${anek.variable} ${anekHindi.variable} ${paperMast.variable} ${paperHead.variable} ${paperBody.variable} ${ledgerHand.variable}`;
+export const recipeFonts = `${spartan.variable} ${hankenRs.variable} ${anek.variable} ${anekHindi.variable} ${paperHead.variable}`;
+
+// Type system for /v5 (2026-11-09, "make all fonts used consistent"): Hanken Grotesk for headings and body, League Spartan for labels, eyebrows and
+// buttons, Anek Devanagari for Hindi, Playfair Display (--rs-paper-head) only for the hero title and the header logo. Sizes snap to
+// 12 13 14 16 18 20 22 24 28 32 40 48 56 64 px (responsive headings keep their clamp()); weights are 500 body, 600 emphasis, 700 headings.

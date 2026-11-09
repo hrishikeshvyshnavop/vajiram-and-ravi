@@ -1,0 +1,159 @@
+/* ---------- Learn from the specialists: faculty ID cards on lanyards (RecipeFaculty.tsx) ---------- */
+/* a brass rail runs along the top of each row; each li adds its segment so the rail is continuous */
+.rs-rail ul > li { position: relative; padding-top: 4px; }
+.rs-rail ul > li::before { content: ""; position: absolute; top: -6px; left: -12px; right: -12px; height: 7px; border-radius: 4px; background: linear-gradient(#f1d58a, #b88a2c 60%, #8a6418); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35); }
+.rs-hanger { position: relative; display: flex; flex-direction: column; align-items: center; width: min(230px, 100%); transform-origin: top center; will-change: rotate; }
+.rs-hanger::before { content: ""; width: 16px; height: 16px; margin-top: -10px; border-radius: 50%; border: 3px solid #d8c597; background: transparent; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); }
+.rs-lanyard { display: flex; justify-content: center; width: 24px; height: var(--drop); margin-top: -4px; overflow: hidden; background: linear-gradient(90deg, #e09a1e, var(--rs-saffron) 30%, var(--rs-saffron) 70%, #e09a1e); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25); }
+.rs-lanyard span { writing-mode: vertical-rl; white-space: nowrap; font-family: var(--rs-display), sans-serif; font-weight: 800; font-size: 9px; letter-spacing: 0.22em; line-height: 24px; color: var(--rs-rust); }
+.rs-clip { position: relative; width: 30px; height: 24px; margin-top: -2px; border-radius: 4px 4px 8px 8px; background: linear-gradient(90deg, #8d8d8d, #e8e8e8 45%, #9d9d9d); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); }
+.rs-clip::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 10px; height: 12px; transform: translateX(-50%); border: 2px solid #b5b5b5; border-top: 0; border-radius: 0 0 6px 6px; }
+.rs-idcard { position: relative; width: 100%; margin-top: 4px; padding-bottom: 12px; overflow: hidden; border-radius: 14px; background: linear-gradient(160deg, #fffdf8, #f6eedd); color: var(--rs-deep); box-shadow: 0 26px 40px -18px rgba(0, 0, 0, 0.65), inset 0 0 0 1px rgba(255, 255, 255, 0.7); }
+.rs-idcard::after { /* plastic sheen */ content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.45) 45%, transparent 55%); }
+.rs-idcard-slot { display: block; width: 38px; height: 7px; margin: 8px auto 0; border-radius: 4px; background: rgba(45, 32, 29, 0.28); box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35); }
+.rs-idcard-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px; padding: 8px 12px; background: var(--rs-rust); color: var(--rs-saffron); }
+.rs-idcard-foot { margin: 10px 16px 0; color: var(--rs-deep); }
+@media (max-width: 1279px) {
+  .rs-lanyard { height: calc(var(--drop) * 0.5); }
+}
+
+/* ---------- Enrol: chat with a counsellor (RecipeCounsellorChat.tsx) ---------- */
+.rs-chat { display: flex; flex-direction: column; overflow: hidden; border-radius: 22px; background: var(--rs-cream); color: var(--rs-deep); box-shadow: 0 40px 70px -30px rgba(45, 20, 5, 0.6), 0 0 0 1px rgba(45, 32, 29, 0.12); font-family: var(--rs-body), sans-serif; }
+.rs-chat-head { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: var(--rs-rust); color: var(--rs-cream); }
+.rs-chat-log {
+  display: flex; flex-direction: column; gap: 10px; height: min(560px, 70svh); overflow-y: auto; overscroll-behavior: contain; padding: 18px 16px 22px;
+  /* a quiet buti pattern behind the messages */
+  background: radial-gradient(circle at 12px 12px, rgba(174, 59, 15, 0.08) 2px, transparent 2.5px) 0 0 / 28px 28px, var(--rs-cream);
+}
+.rs-chat-day { align-self: center; padding: 3px 10px; border-radius: 999px; background: rgba(45, 32, 29, 0.08); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.7; }
+.rs-chat-bubble { position: relative; max-width: 82%; padding: 10px 14px; border-radius: 18px 18px 18px 6px; background: #fff; font-size: 15.5px; line-height: 1.4; box-shadow: 0 2px 6px rgba(45, 32, 29, 0.08); animation: rs-chat-in 260ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.rs-chat-bubble--me { border-radius: 18px 18px 6px 18px; background: var(--rs-rust); color: var(--rs-saffron); font-weight: 600; }
+.rs-chat-bubble--error { background: #fff1ea; color: var(--rs-orange); font-weight: 600; box-shadow: inset 0 0 0 1.5px rgba(209, 87, 14, 0.4); }
+.rs-chat-edit { display: block; margin-top: 2px; margin-left: auto; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--rs-cream); opacity: 0.7; text-decoration: underline; text-underline-offset: 2px; }
+.rs-chat-edit:hover { opacity: 1; }
+.rs-chat-chips { display: flex; flex-wrap: wrap; gap: 8px; padding-left: 4px; animation: rs-chat-in 300ms ease-out; }
+.rs-chat-chip { display: inline-flex; align-items: center; min-height: 38px; padding: 0 14px; border-radius: 999px; border: 2px solid var(--rs-rust); background: #fff; color: var(--rs-rust); font-size: 14px; font-weight: 600; transition: background-color 200ms, color 200ms, transform 200ms; }
+.rs-chat-chip:hover { background: var(--rs-rust); color: var(--rs-saffron); transform: translateY(-2px); }
+.rs-chat-chip:focus-visible { outline: 2px solid var(--rs-orange); outline-offset: 2px; }
+.rs-chat-chip--ghost { border-color: rgba(45, 32, 29, 0.3); color: var(--rs-deep); background: transparent; }
+.rs-chat-summary { align-self: flex-start; width: min(100%, 360px); padding: 10px 14px; border-radius: 14px; background: #fff; font-size: 14px; box-shadow: 0 2px 6px rgba(45, 32, 29, 0.08); }
+.rs-chat-typing { display: inline-flex; gap: 5px; padding: 14px 16px; }
+.rs-chat-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--rs-deep); opacity: 0.35; animation: rs-chat-dot 1s infinite ease-in-out; }
+.rs-chat-typing i:nth-child(2) { animation-delay: 0.15s; }
+.rs-chat-typing i:nth-child(3) { animation-delay: 0.3s; }
+.rs-chat-compose { display: flex; align-items: center; gap: 4px; height: 64px; padding: 0 10px 0 6px; border-top: 1px solid rgba(45, 32, 29, 0.12); background: #fff; }
+.rs-chat-send { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--rs-rust); color: var(--rs-saffron); font-size: 17px; transition: transform 200ms, opacity 200ms; }
+.rs-chat-send:disabled { opacity: 0.35; cursor: not-allowed; }
+.rs-chat-send:not(:disabled):hover { transform: scale(1.08) rotate(-8deg); }
+@keyframes rs-chat-in { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes rs-chat-dot { 0%, 80%, 100% { transform: translateY(0); opacity: 0.35; } 40% { transform: translateY(-4px); opacity: 0.8; } }
+@media (prefers-reduced-motion: reduce) {
+  .rs-chat-bubble, .rs-chat-chips { animation: none; }
+  .rs-chat-typing i { animation: none; }
+}
+
+/* ---------- /v5 hero: toppers face-off (RecipeHeroFaceoff.tsx, after bowiesheroes.tilda.ws) ---------- */
+.rs-fo { background: radial-gradient(ellipse 70% 60% at 50% 35%, #a23a17 0%, #6a2410 52%, #3a1409 100%); color: var(--rs-cream); }
+.rs-fo-light { position: absolute; z-index: 0; top: -30%; left: 38%; width: 46vw; height: 150%; transform-origin: 50% 0; rotate: 32deg; background: linear-gradient(90deg, transparent, rgba(209, 87, 14, 0.55) 35%, rgba(252, 176, 51, 0.35) 55%, transparent); filter: blur(40px); mix-blend-mode: screen; pointer-events: none; }
+.rs-fo-light { will-change: transform; } /* perf: blurred + blended; keep it on its own layer */
+.rs-fo-grain { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: url(/grain.png) repeat; background-size: 220px; mix-blend-mode: soft-light; opacity: 0.3; }
+.rs-fo-grain { will-change: transform; } /* perf: own layer, so its soft-light blend is done when compositing instead of repainting the hero under moving portraits */
+.rs-fo-wrap { position: absolute; z-index: 1; bottom: 0; width: min(46vw, 760px); pointer-events: none; }
+.rs-fo-wrap--l { left: -9vw; }
+.rs-fo-wrap--r { right: -9vw; }
+.rs-fo-img { width: 100%; height: auto; -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 96%); mask-image: linear-gradient(180deg, #000 62%, transparent 96%); }
+/* the title: condensed, huge, ivory */
+/* line-height 1 + a little padding so the reveal masks never cut the caps */
+.rs-fo-title { word-spacing: 0.1em; font-family: var(--rs-paper-head), Georgia, serif; font-weight: 700; font-variant-numeric: lining-nums; text-transform: uppercase; color: #f1ede6; line-height: 1; letter-spacing: -0.065em; }
+.rs-fo-big { padding: 0.06em 0.04em 0; margin-bottom: -0.08em; font-size: clamp(64px, 12vw, 200px); }
+.rs-fo-small { padding: 0.04em 0.04em 0.02em; font-size: clamp(36px, 6.2vw, 104px); letter-spacing: -0.055em; }
+/* the flag layer sits exactly on the title and only shows through the glyphs */
+.rs-fo-sub { max-width: 640px; font-family: var(--rs-body), sans-serif; font-size: clamp(17px, 1.45vw, 21px); font-weight: 500; line-height: 1.45; text-align: center; text-wrap: balance; color: rgba(254, 248, 236, 0.92); }
+.rs-fo-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; font-family: var(--rs-body), sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -0.005em; color: var(--rs-cream); }
+.rs-fo-row li { display: inline-flex; align-items: center; gap: 18px; white-space: nowrap; }
+.rs-fo-row li > span { color: var(--rs-saffron); }
+.rs-fo-row b { margin-right: 4px; color: var(--rs-saffron); }
+.rs-fo-plate { position: absolute; z-index: 4; bottom: 28px; display: flex; flex-direction: column; gap: 2px; font-family: var(--rs-body), sans-serif; font-size: 15px; font-weight: 600; letter-spacing: -0.005em; color: var(--rs-cream); }
+.rs-fo-plate b { font-family: var(--rs-paper-head), Georgia, serif; font-weight: 700; letter-spacing: -0.065em; font-variant-numeric: lining-nums; font-size: 40px; line-height: 0.9; color: var(--rs-saffron); }
+.rs-fo-plate--l { left: 28px; }
+.rs-fo-plate--r { right: 28px; align-items: flex-end; text-align: right; }
+@media (max-width: 1023px) {
+  .rs-fo-wrap { width: 62vw; bottom: auto; top: 70px; opacity: 0.55; }
+  .rs-fo-wrap--l { left: -18vw; }
+  .rs-fo-wrap--r { right: -18vw; }
+  .rs-fo-plate { display: none; }
+  .rs-fo-row { font-size: 12px; }
+}
+
+/* ---------- Learn from the specialists: monument.tv team experience (RecipeFacultyTeam.tsx) ---------- */
+.rs-team { position: relative; z-index: 1; background: #6e0b06; color: var(--rs-cream); } /* z: covers the held hero */
+.rs-team-pin { position: relative; min-height: 100svh; overflow: hidden; padding: 110px 28px 40px; will-change: transform; } /* own layer: the pin moves every scroll frame, its big background is not re-rasterised */
+.rs-team-veil { position: absolute; inset: 0; z-index: 4; background: #020202; opacity: 0; pointer-events: none; }
+.rs-team-title { word-spacing: 0.1em; position: relative; z-index: 1; margin-left: 9vw; font-family: var(--rs-body), sans-serif; font-weight: 700; text-transform: none; letter-spacing: -0.03em; font-size: clamp(56px, 8.6vw, 150px); line-height: 0.84; letter-spacing: -0.03em; color: #170403; }
+.rs-team-line { padding: 0.09em 0.04em 0.05em; margin: -0.09em -0.04em -0.05em; } /* room for the glyphs inside the line mask */
+.rs-team-kicker { opacity: var(--team-ui, 1); position: absolute; z-index: 3; top: 110px; right: 28px; text-align: right; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; color: var(--rs-saffron); }
+.rs-team-kicker-sub { display: block; margin-top: 4px; font-size: 12px; color: var(--rs-cream); opacity: 0.7; }
+.rs-team-photo { position: absolute; z-index: 2; left: 18vw; top: 32%; width: min(19vw, 300px); aspect-ratio: 4 / 5; margin: 0; overflow: hidden; background: #2b0805; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.7); opacity: 0; transform: translateY(30px) scale(0.96); transition: opacity 500ms, transform 700ms cubic-bezier(0.16, 1, 0.3, 1); }
+.rs-team-photo.is-on { opacity: var(--team-ui, 1); transform: none; }
+/* portrait swap: crossfade + settle (opacity/transform only, composited; was a clip-path wipe that repainted) */
+.rs-team-photo-img { opacity: 0; transform: scale(1.06); transition: opacity 450ms ease, transform 900ms cubic-bezier(0.16, 1, 0.3, 1); }
+.rs-team-photo-img.is-active { opacity: 1; transform: none; z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .rs-team-photo-img { transition: none; } }
+.rs-team-list { position: absolute; z-index: 3; left: 28px; right: 28px; top: 33%; opacity: 0; transition: opacity 600ms; }
+.rs-team-list.is-on { opacity: var(--team-ui, 1); }
+.rs-team-row { display: grid; grid-template-columns: 6vw 1fr 1fr; width: 100%; align-items: baseline; padding: 4px 0; text-align: left; font-family: var(--rs-body), sans-serif; font-size: clamp(18px, 1.7vw, 26px); line-height: 1.25; color: rgba(254, 248, 236, 0.42); transition: color 300ms; }
+.rs-team-row:hover, .rs-team-row:focus-visible, .rs-team-row.is-active { color: var(--rs-cream); outline: none; }
+.rs-team-num { transition: color 300ms; }
+.rs-team-num { padding-left: 4.5vw; }
+.rs-team-name { padding-left: 38vw; white-space: nowrap; }
+.rs-team-role { text-align: right; white-space: nowrap; }
+.rs-team-role small { font-size: 0.7em; opacity: 0.7; }
+.rs-team-cta { position: absolute; z-index: 3; left: calc(28px + 9vw + 34vw); bottom: 34px; } /* look comes from .rs-cta */
+.rs-team-rail { position: absolute; left: calc(4.5vw - 22px); top: 6px; bottom: 6px; width: 3px; border-radius: 3px; background: rgba(254, 248, 236, 0.2); overflow: hidden; }
+.rs-team-rail-fill { position: absolute; inset: 0; background: var(--rs-saffron); transform: scaleY(0); transform-origin: 50% 0; }
+.rs-team-row.is-active .rs-team-num { color: var(--rs-saffron); }
+.rs-team-progress { position: absolute; z-index: 3; right: 28px; bottom: 44px; display: flex; align-items: center; gap: 16px; opacity: 0; transition: opacity 600ms; }
+.rs-team-progress.is-on { opacity: var(--team-ui, 1); }
+.rs-team-count { font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.08em; color: rgba(254, 248, 236, 0.8); font-variant-numeric: tabular-nums; }
+.rs-team-count b { color: var(--rs-saffron); font-size: 30px; }
+.rs-team-track { position: relative; width: clamp(180px, 18vw, 300px); height: 4px; border-radius: 4px; background: rgba(254, 248, 236, 0.22); overflow: hidden; }
+.rs-team-bar { position: absolute; inset: 0; background: var(--rs-saffron); transform: scaleX(0); transform-origin: 0 50%; }
+/* Collage look (`look="collage"`, /v5): the hero of vajiram-ravi-sharon.vercel.app: peach torn-paper cut-outs (Parliament, India Gate,
+   Secretariat, books, OMR sheets, paint splashes) on the right, the plain peach paper on the left for the title. Text turns ink/rust. */
+.rs-team--collage { background: #fece9d; color: var(--rs-deep); }
+/* Dimmed with the brand rust (brand-800): light over the empty paper where the title sits, deeper over the cut-outs (user 2026-11-07). */
+.rs-team--collage .rs-team-pin { background: #fece9d; }
+/* perf (2026-11-07): the collage lives on its own layer, so the moving title, portraits and list above it never force it to be repainted */
+.rs-team--collage .rs-team-pin::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; will-change: transform; background: linear-gradient(90deg, rgba(141, 46, 19, 0.12) 0, rgba(141, 46, 19, 0.38) 35%, rgba(141, 46, 19, 0.62) 100%), url(/v5/team/collage.webp) right center / auto 100% no-repeat, #fece9d; }
+.rs-team--collage .rs-team-title { color: var(--rs-deep); }
+.rs-team--collage .rs-team-kicker { color: var(--rs-rust); padding: 10px 16px; border-radius: 16px; background: rgba(255, 243, 228, 0.9); }
+.rs-team--collage .rs-team-kicker-sub { color: var(--rs-deep); opacity: 0.75; }
+.rs-team--collage .rs-team-photo { background: #fff7ec; border: 6px solid #fff7ec; box-shadow: 0 26px 40px -18px rgba(70, 25, 5, 0.55); }
+.rs-team--collage .rs-team-list::before { content: ""; position: absolute; z-index: -1; top: -16px; bottom: -16px; left: calc(44vw - 24px); right: -12px; border-radius: 20px; background: rgba(255, 243, 228, 0.88); }
+.rs-team--collage .rs-team-row { color: rgba(45, 18, 9, 0.5); }
+.rs-team--collage .rs-team-row:hover, .rs-team--collage .rs-team-row:focus-visible, .rs-team--collage .rs-team-row.is-active { color: var(--rs-deep); }
+.rs-team--collage .rs-team-row.is-active .rs-team-num { color: var(--rs-rust); }
+.rs-team--collage .rs-team-rail, .rs-team--collage .rs-team-track { background: rgba(45, 18, 9, 0.2); }
+.rs-team--collage .rs-team-rail-fill, .rs-team--collage .rs-team-bar { background: var(--rs-rust); }
+.rs-team--collage .rs-team-progress { padding: 10px 20px; border-radius: 999px; background: rgba(255, 243, 228, 0.9); }
+.rs-team--collage .rs-team-count { color: rgba(45, 18, 9, 0.75); }
+.rs-team--collage .rs-team-count b { color: var(--rs-rust); }
+.rs-team--collage .rs-cta { background: var(--rs-rust); color: var(--rs-cream); }
+@media (max-width: 1023px) {
+  .rs-team--collage .rs-team-pin { background: #fece9d; }
+  .rs-team--collage .rs-team-pin::before { background: linear-gradient(rgba(254, 206, 157, 0.82), rgba(254, 206, 157, 0.82)), url(/v5/team/collage.webp) 75% center / cover no-repeat, #fece9d;; }
+  .rs-team--collage .rs-team-list::before { display: none; }
+  .rs-team--collage .rs-team-row { border-top-color: rgba(45, 18, 9, 0.15); }
+}
+@media (max-width: 1023px) {
+  .rs-team-pin { padding: 90px 20px 60px; }
+  .rs-team-title { margin-left: 0; font-size: clamp(56px, 17vw, 120px); }
+  .rs-team-kicker { position: static; margin-top: 18px; text-align: left; }
+  .rs-team-photo { position: relative; left: auto; top: auto; width: 62vw; margin: 26px 0 0; opacity: 1; transform: none; }
+  .rs-team-list { position: static; margin-top: 22px; opacity: 1; }
+  .rs-team-row { grid-template-columns: 34px 1fr; padding: 8px 0; border-top: 1px solid rgba(254, 248, 236, 0.15); font-size: 18px; }
+  .rs-team-num, .rs-team-name { padding-left: 0; }
+  .rs-team-role { grid-column: 2; text-align: left; font-size: 14px; }
+  .rs-team-cta { position: static; margin-top: 26px; }
+  .rs-team-progress, .rs-team-rail { display: none; }
+}

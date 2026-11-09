@@ -10,7 +10,7 @@ export default function RecipeManifesto() {
       <div className="relative mx-auto grid max-w-[var(--rs-max)] gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-end">
         <div>
           <p data-pop="" className="rs-small text-[14px] opacity-80">
-            Our manifesto · <span lang="hi" className="rs-hi normal-case">हमारा घोषणापत्र</span>
+            <span className="l-en">Our manifesto · </span><span lang="hi" className="rs-hi normal-case">हमारा घोषणापत्र</span>
           </p>
           <h2 data-pop="" className="rs-display mt-4 text-[clamp(48px,7vw,124px)]">
             Read the nation.

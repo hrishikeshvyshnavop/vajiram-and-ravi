@@ -16,7 +16,9 @@ export default function RecipeHow() {
   return (
     <section id="how" className="rs-how" aria-labelledby="how-title">
       <div className="rs-how-wrap">
-        <p data-pop="" className="rs-how-eyebrow">Our how</p>
+        <p data-pop="" className="rs-how-eyebrow">
+          <span className="l-en">How it works · </span><span lang="hi" className="rs-hi normal-case">तैयारी कैसे होती है</span>
+        </p>
         <h2 id="how-title" data-pop="" className="rs-how-title">
           Four steps from
           <br />

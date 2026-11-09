@@ -1,0 +1,777 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SmoothScroll from "./SmoothScroll";
+import RecipeCounsellorChat from "./RecipeCounsellorChat";
+import RecipeFooter from "./RecipeFooter";
+import SectionMotif from "./SectionMotifs";
+import RecipeHeader from "./RecipeHeader";
+import RecipeTrust from "./RecipeTrust";
+import RecipeLedger from "./RecipeLedger";
+import RecipeTeam from "./RecipeTeam";
+import RecipeResources from "./RecipeResources";
+import RecipeHeroFaceoff from "./RecipeHeroFaceoff";
+import RecipeBatches from "./RecipeBatches";
+import RecipeContactLocations from "./RecipeContactLocations";
+import RecipeStories from "./RecipeStories";
+import RecipeWhy from "./RecipeWhy";
+import RecipeAbout from "./RecipeAbout";
+import RecipeHow from "./RecipeHow";
+import RecipeCourses from "./RecipeCourses";
+import RecipeCounselling from "./RecipeCounselling";
+import RecipeToppersPaper from "./RecipeToppersPaper";
+import "./recipe-story.css";
+
+gsap.registerPlugin(ScrollTrigger);
+
+// /v5 shows only the finalised sections (hero, The Aspirant's Chronicle, team, footer). The other
+// sections are kept in the code below; set this to true to show them again (user 2026-11-06).
+const SHOW_DRAFTS = false;
+
+// Iteration 10 (/v5): "The Recipe for Rank 1", after eathungrytiger.com (Hungry Tiger sauce).
+// Their idea, carried over: a loud packaging-style landing where one product object (the jar)
+// rides the scroll, spins to show its label and "what's inside", then hands over to ingredients,
+// a nutrition label, "why the jar matters" cards, a marquee and recipe cards. Here the product is
+// the V&R study kit (a 3D book), the nutrition label is a programme facts label, and the recipes
+// are programmes. Copy and figures come from the site copy already in this app and the domain notes.
+
+
+
+const pillars = [
+  { kicker: "Taught in", title: "Experienced faculty", text: "Every subject is taught by faculty who know the UPSC syllabus inside out." },
+  { kicker: "Tested often", title: "A structured method", text: "Classes, study material and tests follow one plan, from the first class to the interview." },
+  { kicker: "Guided through", title: "Honest guidance", text: "Counsellors and mentors tell you where you stand and what to work on next." },
+];
+
+const programmes = [
+  { tags: ["Foundation", "11 months"], name: "Classroom GS PCM 2027", text: "Prelims-cum-Mains General Studies in the classroom, with study material and regular tests.", img: "/hero/classroom.jpg" },
+  { tags: ["Foundation", "Online"], name: "Online GS PCM 2027", text: "The same programme online, so you can prepare from wherever you are.", img: "/hero/online.jpg" },
+  { tags: ["Prelims", "Test series"], name: "Prelims Test Series", text: "Topic-wise and full-length tests with detailed explanations.", img: "/hero/prelims.jpg" },
+  { tags: ["Interview", "IGP"], name: "Interview Guidance Programme", text: "9 of the CSE 2025 top 10 prepared for the Personality Test with it.", img: "/hero/interview.jpg" },
+];
+
+// CSE 2025 top 10 and the V&R programmes each took, as listed on the current site (/v3 Toppers).
+const toppers = [
+  { air: 1, name: "Anuj Agnihotri", img: "anuj-agnihotri", took: ["Interview Guidance Programme"] },
+  { air: 2, name: "Rajeshwari Suve M", img: "rajeshwari-suve-m", took: ["PowerUp Prelims Test Series", "IGP", "Mains Test Series"] },
+  { air: 3, name: "Akansh Dhull", img: "akansh-dhull", took: ["GS Prelims cum Mains Classroom"] },
+  { air: 4, name: "Raghav Jhunjhunwala", img: "raghav-jhunjhunwala", took: ["IGP"] },
+  { air: 5, name: "Ishan Bhatnagar", img: "ishan-bhatnagar", took: ["Sociology Optional", "Prelims CAMP", "IGP"] },
+  { air: 6, name: "Zinnia Aurora", img: "zinnia-aurora", took: ["GS Ethics Module", "IGP", "Power Up 23"] },
+  { air: 7, name: "A R Rajah Mohaideen", img: "a-r-rajah-mohaideen", took: ["IGP"] },
+  { air: 8, name: "Pakshal Secretry", img: "pakshal-secretry", took: ["Mains Camp", "IGP"] },
+  { air: 9, name: "Astha Jain", img: "astha-jain", took: ["IGP"] },
+  { air: 10, name: "Ujjwal Priyank", img: "ujjwal-priyank", took: ["IGP"] },
+];
+
+// Faculty and subjects as listed on the current site (/v3 Educators).
+const specialists = [
+  { name: "SK Manocha", subject: "General Studies", detail: "Polity & Governance", img: "sk-manocha" },
+  { name: "Brijender Singh", subject: "Essay", detail: "Mains", img: "brijender-singh" },
+  { name: "Md. Rizwan", subject: "Geography", detail: "Optional", img: "md-rizwan" },
+  { name: "Md. Tarique", subject: "History", detail: "Optional", img: "md-tarique" },
+  { name: "Mukul Pathak", subject: "Psychology", detail: "Optional", img: "mukul-pathak" },
+  { name: "Shyam Sundar", subject: "Economics", detail: "Optional", img: "shyam-sundar" },
+];
+
+// The three stages of the UPSC CSE and what V&R offers at each (domain overview + current site copy).
+const stages = [
+  { name: "Prelims", hi: "प्रारंभिक", exam: "Objective MCQs: GS Paper I counts for the cut-off; CSAT is qualifying (33%).", give: ["GS classes with study material", "CSAT course", "PowerUp Prelims Test Series", "Current Affairs Course"] },
+  { name: "Mains", hi: "मुख्य", exam: "Written answers: Essay, GS I to GS IV and two optional papers.", give: ["Model answers for Mains", "Sure Shot Mains and Mains Test Series", "Optional subject coaching", "Essay and Ethics modules"] },
+  { name: "Interview", hi: "साक्षात्कार", exam: "The Personality Test before a UPSC board.", give: ["Interview Guidance Programme (IGP)", "9 of the CSE 2025 top 10 prepared for the interview with IGP"] },
+];
+
+// "From first call to the interview board": the four steps of joining V&R, from teammate Sharon's
+// iteration (vajiram-ravi-sharon.vercel.app, "How it works"), restyled for /v5.
+const journey = [
+  { step: "Counselling", hi: "परामर्श", title: "Talk to us", text: "Book a free counselling call. We map your stage, your optional and the mode that suits you.", meta: "Free · 15-min call · English & हिंदी", tag: "Start here", hot: true, icon: "phone" },
+  { step: "Enrolment", hi: "नामांकन", title: "Pick your batch", text: "Choose a programme and a start date: classroom in Delhi or LIVE-online.", meta: "Classroom · LIVE-online", tag: "Seats fill early", icon: "calendar" },
+  { step: "Preparation", hi: "तैयारी", title: "Learn & practise", text: "Classes with subject experts, plus notes, tests and answer writing every week.", meta: "Notes · Tests · Answer writing", tag: "Weekly practice", icon: "pen" },
+  { step: "Mains & interview", hi: "साक्षात्कार", title: "Go all the way", text: "Mains test series, mentorship and the Interview Guidance Programme, right up to the board.", meta: "Mains · Mentorship · IGP", tag: "Up to the board", icon: "pillars" },
+] as const;
+
+const journeyIcons: Record<(typeof journey)[number]["icon"], React.ReactNode> = {
+  phone: <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />,
+  calendar: (
+    <>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M3 10h18M8 3v4M16 3v4" />
+    </>
+  ),
+  pen: (
+    <>
+      <path d="M4 20l4-1 11-11-3-3L5 16z" />
+      <path d="M14 7l3 3" />
+    </>
+  ),
+  pillars: <path d="M3 21h18M5 21V10M9.5 21V10M14.5 21V10M19 21V10M2 10l10-6 10 6z" />,
+};
+
+const glance = [
+  { k: "Duration", v: "11 months" },
+  { k: "Covers", v: "Prelims and Mains" },
+  { k: "Attend", v: "Classroom or live online" },
+  { k: "Medium", v: "English or Hindi" },
+  { k: "Centres", v: "New Delhi · Chennai" },
+];
+
+
+/* ---------- pieces ---------- */
+
+
+// Hero collage by the V&R team (vr-homepage-v25.vercel.app, "hero__stage"), reused here in place
+// of the study-kit book. Layer boxes are % of the 1536x952 backdrop, measured from that page at
+// 1440px; DOM order is stacking order.
+type Layer = { id: string; w: number; h: number; box: [number, number, number]; depth: number };
+const layers: Layer[] = [
+  { id: "bg", w: 1536, h: 952, box: [0, 0, 100], depth: -80 },
+  { id: "satellite", w: 219, h: 161, box: [64.4, 13.0, 14.6], depth: 70 },
+  { id: "rocket", w: 73, h: 255, box: [79.4, 22.8, 4.75], depth: 60 },
+  { id: "temple", w: 357, h: 380, box: [23.3, 28.7, 23.3], depth: -10 },
+  { id: "pillar", w: 309, h: 628, box: [41.4, 10.6, 20.1], depth: 0 },
+  { id: "manuscript", w: 301, h: 285, box: [16.0, 47.9, 19.6], depth: 20 },
+  { id: "book", w: 340, h: 348, box: [48.0, 39.7, 22.2], depth: 40 },
+  { id: "metro", w: 383, h: 192, box: [66.7, 60.5, 25.0], depth: 30 },
+  { id: "wheel", w: 343, h: 276, box: [12.2, 62.9, 22.3], depth: 50 },
+  { id: "gandhi", w: 339, h: 376, box: [26.1, 48.9, 22.0], depth: 60 },
+  { id: "parliament", w: 593, h: 280, box: [43.1, 69.7, 38.6], depth: 70 },
+  { id: "front", w: 1153, h: 189, box: [11.6, 80.7, 75.0], depth: 100 },
+];
+
+function IndiaCollage() {
+  return (
+    <div className="rs-collage" data-collage="">
+      {layers.map((l) => (
+        <div key={l.id} data-layer="" data-depth={l.depth} className={`rs-layer rs-layer-${l.id}`} style={{ left: `${l.box[0]}%`, top: `${l.box[1]}%`, width: `${l.box[2]}%` }}>
+          <div data-mouse="" className="will-change-transform">
+            <Image src={`/v5/hero/${l.id}.webp`} alt="" width={l.w} height={l.h} sizes={`${Math.ceil(l.box[2] * 0.6)}vw`} className="block h-auto w-full" priority />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Middle-dot separator drawn as a small circle: Anek gives the "·" character zero width, so a
+// typed dot overlaps the next word.
+function Sep() {
+  return <span className="mx-[0.4em] inline-block size-[0.16em] rounded-full bg-current align-middle opacity-70" aria-hidden />;
+}
+
+/* ---------- the page ---------- */
+
+function Story({ hero, teamEntry, teamLook }: { hero: "faceoff" | "collage"; teamEntry: "plain" | "sweep"; teamLook: "dark" | "collage" }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current!;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let mouseCleanup = () => {};
+    let windCleanup = () => {};
+    const ctx = gsap.context(() => {
+      // collage hero only (/v5-collage); the face-off hero animates itself
+      if (root.querySelector("[data-collage]")) {
+      const collage = root.querySelector<HTMLElement>("[data-collage]")!;
+      const mover = root.querySelector<HTMLElement>("[data-mover]")!;
+      const layerEls = gsap.utils.toArray<HTMLElement>("[data-layer]", collage);
+
+      // Each layer sits at its own depth, so tilting the collage shows real parallax.
+      layerEls.forEach((el) => gsap.set(el, { z: Number(el.dataset.depth) }));
+
+      // Intro: title letters drop in; the collage slides in from the right, layers settling in turn.
+      if (!reduce) {
+        gsap.from("[data-hero-char]", { yPercent: 110, rotate: 8, duration: 1.1, ease: "back.out(1.4)", stagger: 0.035, delay: 0.15 });
+        gsap.from("[data-hero-fade]", { autoAlpha: 0, y: 20, duration: 0.8, stagger: 0.08, delay: 0.5 });
+        gsap.from(mover, { xPercent: 18, autoAlpha: 0, duration: 1.6, ease: "expo.out", delay: 0.25 });
+        gsap.from(layerEls.slice(1), { y: 80, autoAlpha: 0, duration: 1.1, ease: "back.out(1.3)", stagger: 0.06, delay: 0.45 });
+      }
+
+      // Mouse parallax: each piece drifts with the cursor by its depth (deeper = further), and the
+      // collage tilts a little toward it. Runs on inner wrappers, separate from the load-in animation.
+      if (!reduce && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+        const stage = root.querySelector<HTMLElement>("[data-stage]")!;
+        const tilt = root.querySelector<HTMLElement>("[data-mouse-tilt]")!;
+        const movers = layerEls.map((el) => {
+          const inner = el.querySelector<HTMLElement>("[data-mouse]")!;
+          const k = (Number(el.dataset.depth) + 90) / 190; // backdrop ~0, front ~1
+          return { k, x: gsap.quickTo(inner, "x", { duration: 0.9, ease: "power3.out" }), y: gsap.quickTo(inner, "y", { duration: 0.9, ease: "power3.out" }) };
+        });
+        const rx = gsap.quickTo(tilt, "rotationX", { duration: 1.1, ease: "power3.out" });
+        const ry = gsap.quickTo(tilt, "rotationY", { duration: 1.1, ease: "power3.out" });
+        const onMove = (e: PointerEvent) => {
+          const nx = e.clientX / window.innerWidth - 0.5;
+          const ny = e.clientY / window.innerHeight - 0.5;
+          movers.forEach((m) => {
+            m.x(nx * 46 * m.k);
+            m.y(ny * 30 * m.k);
+          });
+          ry(nx * 8);
+          rx(-ny * 6);
+        };
+        const onLeave = () => {
+          movers.forEach((m) => {
+            m.x(0);
+            m.y(0);
+          });
+          rx(0);
+          ry(0);
+        };
+        stage.addEventListener("pointermove", onMove);
+        stage.addEventListener("pointerleave", onLeave);
+        mouseCleanup = () => {
+          stage.removeEventListener("pointermove", onMove);
+          stage.removeEventListener("pointerleave", onLeave);
+        };
+      }
+
+      } // end collage hero
+
+      // "Just a plan in every class": words light up one by one as the section scrolls.
+      if (document.querySelector("[data-fill]")) gsap.to("[data-fill] .rs-fill-word", {
+        opacity: 1,
+        stagger: 0.1,
+        ease: "none",
+        scrollTrigger: { trigger: "[data-fill]", start: "top 85%", end: "top 35%", scrub: true },
+      });
+
+      if (reduce) return;
+
+      // Generic pop-in for headings and cards.
+      gsap.utils.toArray<HTMLElement>("[data-pop]").forEach((el) => {
+        const inPaper = !!el.closest("[data-paper]");
+        gsap.from(el, inPaper
+          ? { y: 16, autoAlpha: 0, duration: 0.6, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 90%" } }
+          : { y: 60, rotate: 3, autoAlpha: 0, duration: 0.9, ease: "back.out(1.4)", scrollTrigger: { trigger: el, start: "top 88%" } });
+      });
+      // Result figures count up.
+      gsap.utils.toArray<HTMLElement>("[data-count]").forEach((el) => {
+        const end = Number(el.dataset.count);
+        const o = { v: 0 };
+        gsap.to(o, { v: end, duration: 1.6, ease: "power3.out", onUpdate: () => (el.textContent = String(Math.round(o.v))), scrollTrigger: { trigger: el, start: "top 85%" } });
+      });
+      // Journey: the dotted path between steps 01 -> 04 draws across as the section scrolls in.
+      if (document.querySelector("[data-journey] ol")) gsap.fromTo("[data-journey-line]", { scaleX: 0 }, { scaleX: 1, ease: "none", scrollTrigger: { trigger: "[data-journey] ol", start: "top 85%", end: "top 40%", scrub: true } });
+      // The newspaper is blown in over the hero. The hero holds still (pinned once its bottom reaches the
+      // screen's bottom, no extra spacing) while the paper flies up across it, drifting in from the side,
+      // tipped back and turning like a sheet caught in a breeze, then settles flat. The hero is released only
+      // once the (opaque) team section has covered it, so it never jumps.
+      const heroStage = root.querySelector<HTMLElement>("[data-stage]");
+      if (heroStage && document.getElementById("faculty")) {
+        ScrollTrigger.create({ trigger: heroStage, start: "bottom bottom", endTrigger: "#faculty", end: "top top", pin: true, pinSpacing: false, refreshPriority: 1 });
+        // this pin is created after the child sections' pins (the team pin), so put triggers back in page order
+        ScrollTrigger.sort();
+        ScrollTrigger.refresh();
+      }
+      // Sweep variant: the newspaper STOPS when its bottom reaches the bottom of the screen and is held while the team
+      // sweeps up over it (RecipeFacultyTeam entry="sweep"), the way the team is held while the footer slides over it.
+      // pinSpacing off: the team's own scroll is the hand-off, no extra gap. Released once the team covers the screen.
+      if (teamEntry === "sweep" && !reduce && window.matchMedia("(min-width: 1024px)").matches && document.getElementById("toppers") && document.getElementById("faculty")) {
+        ScrollTrigger.create({ trigger: "#toppers", start: "bottom bottom", endTrigger: "#faculty", end: "top top", pin: true, pinSpacing: false });
+        ScrollTrigger.sort();
+      }
+      // Subtle on purpose (user 2026-11-06: "over animated, fix it to a subtle one"): the sheet rises a short
+      // way (12% of the screen) with a soft fade as it comes in, then lies still. No tilt, no overshoot, no
+      // wind, and no scroll takeover: one scrubbed transform + opacity tween, both compositor-only.
+      const paperEl = document.querySelector<HTMLElement>("[data-paper]");
+      if (paperEl) {
+        const fly = gsap.fromTo(
+          paperEl,
+          { y: () => window.innerHeight * 0.12 },
+          {
+            y: 0,
+            ease: "power1.out",
+            scrollTrigger: { trigger: "#toppers", start: "top bottom", end: "top 35%", scrub: true, invalidateOnRefresh: true },
+          },
+        );
+        // Measure the reveals inside the sheet with the sheet at rest; the scrub puts it back afterwards.
+        const atRest = () => fly.progress(1);
+        ScrollTrigger.addEventListener("refreshInit", atRest);
+        const prevWind = windCleanup;
+        windCleanup = () => {
+          prevWind();
+          ScrollTrigger.removeEventListener("refreshInit", atRest);
+        };
+      }
+      // The rust backdrop behind the paper is opaque from the start (user 2026-11-07: "when the newspaper section comes the hero is
+      // still visible"). Sections now sit between the hero and the paper (About, Why, How, Courses), so a fade-in let the held hero
+      // show through at the top of the newspaper. The hero is hidden from the moment About covers the screen (below), and the
+      // backdrop is solid, so nothing of the hero can show.
+      if (document.querySelector("[data-toppers-bg]")) gsap.set("[data-toppers-bg]", { opacity: 1 });
+      // Once the About section has covered the screen, the held hero is completely hidden behind it, so stop painting it: hidden (not
+      // removed) so the pin keeps its place. This takes the hero's big images, glow and grain out of every frame for the rest of the page.
+      if (heroStage) {
+        ScrollTrigger.create({
+          trigger: document.getElementById("about") ? "#about" : "#toppers",
+          start: "top top",
+          endTrigger: "#faculty",
+          end: "top top",
+          onToggle: (self) => {
+            heroStage.style.visibility = self.isActive ? "hidden" : "";
+          },
+        });
+      }
+      // (Removed 2026-11-07: a scrubbed autoAlpha:0 on the held hero's children. It read the hero glow's opacity while
+      // the intro still had it at 0, so scrolling back up left the glow missing. The rust gradient backdrop above now
+      // covers the hero as the paper lands, so nothing needs fading.)
+      // (Removed 2026-11-07, user: no reveal animation on the newspaper text or elements: the sheet fade, the photo "develop" and the AIR 1 seal stamp-in.)
+      gsap.utils.toArray<HTMLElement>("[data-tilt-photo]").forEach((el, i) => {
+        gsap.fromTo(el, { rotate: i % 2 ? 4 : -4, y: 40 }, { rotate: 0, y: 0, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "center center", scrub: true } });
+      });
+    }, root);
+    return () => {
+      mouseCleanup();
+      windCleanup();
+      ctx.revert();
+    };
+  }, []);
+
+  return (
+    <div ref={rootRef}>
+      {hero === "collage" ? (
+        <>
+      {/* ---------- hero: copy left, the team's India collage right (no scroll pinning) ---------- */}
+      <section data-stage="" className="rs-grain relative overflow-hidden bg-[var(--rs-rust)]">
+        <SectionMotif variant="newsprint" className="!text-inherit" />
+        <div className="rs-dots absolute inset-x-7 top-[78px]" />
+
+        <div className="relative mx-auto grid min-h-[100svh] max-w-[calc(var(--rs-max)+56px)] items-center gap-8 px-7 pt-[110px] pb-12 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-4">
+          {/* Copy */}
+          <div className="relative z-10">
+            <p data-hero-fade="" className="rs-small text-[15px]">
+              Vajiram &amp; Ravi · UPSC coaching since 1976
+            </p>
+            <h1 className="rs-display mt-4 text-[clamp(38px,10.5vw,52px)] leading-[0.92] lg:text-[clamp(52px,6.1vw,104px)]" aria-label="Your UPSC journey starts here: Civil Services preparation">
+              {["YOUR UPSC", "JOURNEY", "STARTS HERE"].map((line) => (
+                <span key={line} className="block overflow-hidden whitespace-nowrap" aria-hidden>
+                  {line.split("").map((c, i) => (
+                    <span key={i} data-hero-char="" className={c === " " ? "inline-block w-[0.3em]" : "inline-block"}>
+                      {c === " " ? "" : c}
+                    </span>
+                  ))}
+                </span>
+              ))}
+            </h1>
+            <div data-hero-fade="" className="rs-dots mt-6 max-w-[560px]" />
+            <p data-hero-fade="" className="rs-display mt-5 text-[clamp(20px,1.9vw,30px)]">
+              {["IAS", "IPS", "IFS", "and every Civil Service"].map((w, i) => (
+                <span key={w}>
+                  {i > 0 && <Sep />}
+                  {w}
+                </span>
+              ))}
+            </p>
+            <p data-hero-fade="" lang="hi" className="rs-hi mt-1 text-[clamp(15px,1.25vw,19px)] opacity-80">
+              {["सिविल सेवा परीक्षा की तैयारी", "प्रारंभिक", "मुख्य", "साक्षात्कार"].map((w, i) => (
+                <span key={w}>
+                  {i > 0 && <Sep />}
+                  {w}
+                </span>
+              ))}
+            </p>
+            <p data-hero-fade="" className="mt-6 max-w-[480px] text-[17px] leading-snug text-[var(--rs-cream)]/85">
+              One preparation for the UPSC Civil Services Examination, whichever service you aim for. Classroom and online courses, test series and interview guidance, from Prelims to the Personality Test.
+            </p>
+            <div data-hero-fade="" className="mt-7 flex flex-wrap items-center gap-2">
+              <a href="#enrol" className="rs-cta">
+                Enrol for UPSC 2027
+              </a>
+              <a href="#courses" className="rs-cta rs-cta-ghost">
+                Courses
+              </a>
+            </div>
+            {/* Proof: the CSE 2025 result */}
+            <a data-hero-fade="" href="#toppers" className="mt-8 inline-flex max-w-full items-center gap-4 rounded-2xl bg-[var(--rs-saffron)] py-3 pr-5 pl-4 text-[var(--rs-deep)] transition-transform duration-300 hover:-rotate-1">
+              <span className="rs-display shrink-0 text-[28px] leading-none whitespace-nowrap sm:text-[34px]">AIR 1–10</span>
+              <span className="text-[14px] leading-snug">
+                <span className="rs-small block text-[11px] opacity-70">UPSC CSE 2025</span>
+                All ten prepared with Vajiram &amp; Ravi →
+              </span>
+            </a>
+          </div>
+
+          {/* The collage (by the V&R team) */}
+          <div data-mover="" className="rs-collage-wrap relative w-full lg:-mr-[3vw]">
+            <div data-mouse-tilt="" className="[transform-style:preserve-3d]">
+              <IndiaCollage />
+            </div>
+          </div>
+        </div>
+      </section>
+        </>
+      ) : (
+        <RecipeHeroFaceoff toppers={toppers} />
+      )}
+
+      {/* ---------- the institute, straight under the hero ---------- */}
+      <RecipeAbout />
+
+      {/* ---------- why us: six reasons, straight under the institute section ---------- */}
+      <RecipeWhy />
+
+      {/* ---------- how: four steps, under why ---------- */}
+      <RecipeHow />
+
+      {/* ---------- courses: the eight programmes, under how ---------- */}
+      <RecipeCourses />
+
+      {/* ---------- meet the toppers: The Aspirant's Chronicle, an old newspaper front page (right after the hero) ---------- */}
+      <RecipeToppersPaper toppers={toppers} />
+
+      {/* ---------- learn from the specialists: cards on the Courses design language (user 2026-11-09). The pinned monument.tv team is in
+           RecipeFacultyTeam.tsx and backup/removed-sections. teamEntry / teamLook belonged to that version and no longer change the look. ---------- */}
+      <RecipeTeam specialists={specialists} />
+
+      {/* ---------- free resources, straight under the team (user 2026-11-07) ---------- */}
+      <RecipeResources />
+
+      {/* ---------- upcoming batches (storyline section 8): when does it start? ---------- */}
+      <RecipeBatches />
+
+      {/* ---------- counselling callback strip (storyline section 9); owns the #enrol anchor ---------- */}
+      <RecipeCounselling />
+
+      {/* ---------- success stories (10), contact and campus (13, 14); FAQ (12) and the closing call (15) are in the footer ---------- */}
+      <RecipeStories />
+      <RecipeContactLocations />
+
+      {/* ---------- footer: full link set (finalised) ---------- */}
+      <RecipeFooter enrolAnchor={false} />
+
+      {/* ---------- sections still in progress: hidden until finalised (kept, not deleted) ---------- */}
+      {SHOW_DRAFTS && (
+        <>
+
+      {/* ---------- how your preparation works: the three UPSC stages + course at a glance ---------- */}
+      <section id="how-it-works" className="relative overflow-hidden bg-[var(--rs-cream)] px-7 py-28 text-[var(--rs-rust)]">
+        <div className="relative mx-auto max-w-[var(--rs-max)]">
+          <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-end">
+            <div>
+              <p data-pop="" className="rs-small text-[14px] opacity-80">
+                <span className="l-en">How it works · </span><span lang="hi" className="rs-hi normal-case">तैयारी कैसे होती है</span>
+              </p>
+              <h2 data-pop="" className="rs-display mt-4 text-[clamp(52px,6.6vw,108px)]">
+                One exam,
+                <br />
+                three stages
+              </h2>
+            </div>
+            <p data-pop="" className="max-w-[460px] text-xl leading-snug text-[var(--rs-deep)]/85">
+              The UPSC Civil Services Examination has three stages. Here is what Vajiram &amp; Ravi gives you at each one, in a single plan from the first class to the interview.
+            </p>
+          </div>
+
+          <div className="mt-16 grid gap-5 lg:grid-cols-[1fr_1fr_1fr_1.05fr]">
+            {stages.map((st, i) => (
+              <article key={st.name} data-pop="" className="flex flex-col rounded-2xl bg-white p-7 ring-1 ring-[var(--rs-deep)]/10 shadow-[0_18px_40px_-28px_rgba(45,32,29,0.5)]">
+                <div className="flex items-baseline justify-between gap-4">
+                  <span className="rs-small text-[12px] opacity-60">Stage {i + 1}</span>
+                  <span lang="hi" className="rs-hi text-[15px] opacity-70">
+                    {st.hi}
+                  </span>
+                </div>
+                <h3 className="rs-display mt-3 text-[clamp(34px,3vw,48px)]">{st.name}</h3>
+                <p className="mt-2 text-[15px] leading-snug text-[var(--rs-deep)]/70">{st.exam}</p>
+                <div className="rs-dots my-6" style={{ "--rs-saffron": "var(--rs-rust)" } as React.CSSProperties} />
+                <p className="rs-small text-[11px] opacity-60">With Vajiram &amp; Ravi</p>
+                <ul className="mt-3 flex flex-col gap-2.5 text-[16px] leading-snug text-[var(--rs-deep)]/90">
+                  {st.give.map((g) => (
+                    <li key={g} className="flex gap-2.5">
+                      <span className="mt-[7px] size-1.5 shrink-0 rounded-full bg-[var(--rs-orange)]" aria-hidden />
+                      {g}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+
+            {/* Course at a glance */}
+            <div data-pop="" className="rs-label flex flex-col rounded-2xl p-7">
+              <p className="rs-small text-[11px] opacity-60">Flagship course</p>
+              <p className="rs-display mt-3 text-[clamp(30px,2.6vw,40px)] leading-[0.95]">GS Prelims cum Mains 2027</p>
+              <div className="mt-5">
+                {glance.map((g, i) => (
+                  <div key={g.k} className={`rs-label-row ${i === 0 ? "thick" : ""}`}>
+                    <span>{g.k}</span>
+                    <span className="text-right font-semibold">{g.v}</span>
+                  </div>
+                ))}
+              </div>
+              <a href="#courses" className="rs-pill mt-auto self-start !bg-[var(--rs-deep)] !text-[var(--rs-saffron)]">
+                See all courses →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- no fillers, no shortcuts ---------- */}
+      {/* One dark section on the shared container. The orange is a rounded panel inside the right
+          column, with the photo centred in it on equal padding, so every edge matches the page margins. */}
+      <section className="relative overflow-hidden bg-[var(--rs-cream)] px-7 py-28 text-[var(--rs-rust)]">
+        <div className="relative mx-auto grid max-w-[var(--rs-max)] items-stretch gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="flex flex-col justify-center gap-10">
+            <div>
+              <p data-pop="" className="rs-small text-[14px] opacity-80">
+                <span className="l-en">Our method · </span><span lang="hi" className="rs-hi normal-case">हमारी पद्धति</span>
+              </p>
+              <h2 data-pop="" className="rs-display mt-4 text-[clamp(44px,5vw,80px)] leading-[0.92]">
+                No fillers.
+                <br />
+                No shortcuts.
+              </h2>
+              <p data-fill="" className="rs-display mt-3 text-[clamp(30px,3.2vw,52px)] leading-[0.95] text-[var(--rs-deep)]">
+                {"Just a plan in every class.".split(" ").map((w, i) => (
+                  <span key={i} className="rs-fill-word">
+                    {w}{" "}
+                  </span>
+                ))}
+              </p>
+              <p data-pop="" className="mt-6 max-w-[520px] text-xl leading-snug text-[var(--rs-deep)]/85">
+                Every class, every test and every piece of study material follows one plan, built around the UPSC syllabus, so no hour of your preparation is wasted.
+              </p>
+            </div>
+
+            <ol className="flex flex-col">
+              {[
+                { n: "01", t: "A structured syllabus", d: "Classes follow the UPSC syllabus paper by paper, in a set order, from the first class to the interview." },
+                { n: "02", t: "Tests that match the classes", d: "Regular tests check what you have just studied, with detailed explanations, so gaps show up early." },
+                { n: "03", t: "Mentors who tell you the truth", d: "Counsellors and mentors tell you where you stand and what to work on next." },
+              ].map((x) => (
+                <li key={x.n} data-pop="" className="grid grid-cols-[48px_1fr] gap-4 border-t-[3px] border-dotted border-[var(--rs-rust)]/35 py-5">
+                  <span className="rs-small pt-1 text-[13px] opacity-60">{x.n}</span>
+                  <span>
+                    <span className="block text-[20px] leading-tight font-bold">{x.t}</span>
+                    <span className="mt-1.5 block text-[16px] leading-snug text-[var(--rs-deep)]/75">{x.d}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          {/* Right: orange panel, photo centred on equal padding, caption inside the panel. */}
+          <figure className="relative flex flex-col overflow-hidden rounded-3xl bg-[var(--rs-orange)] p-5 sm:p-8 lg:p-10">
+            <SectionMotif variant="jaali" className="!text-white/[0.12]" />
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-[0_24px_48px_-24px_rgba(0,0,0,0.55)] lg:aspect-auto lg:min-h-[480px] lg:flex-1">
+              <Image src="/hero/classroom.jpg" alt="Aspirants in a Vajiram & Ravi classroom" fill sizes="(min-width: 1024px) 45vw, 100vw" className="object-cover" />
+            </div>
+            <figcaption className="relative mt-4 flex items-center justify-between gap-4 text-[14px] font-semibold text-[var(--rs-cream)]">
+              <span>A Vajiram &amp; Ravi classroom</span>
+              <span className="rs-small text-[11px] opacity-80">One plan · every class</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      {/* ---------- tradition & results: a bahi-khata ledger ---------- */}
+      <RecipeLedger />
+
+      {/* ---------- why aspirants trust us: postage stamps (after Sharon's iteration) ---------- */}
+      <RecipeTrust />
+
+      {/* ---------- why the method matters ---------- */}
+      <section className="rs-grain relative bg-[var(--rs-saffron)] px-7 py-28 text-[var(--rs-deep)]">
+        <div className="relative mx-auto max-w-[var(--rs-max)]">
+          <h2 data-pop="" className="rs-display text-center text-[clamp(56px,8vw,128px)]">
+            Why the method
+            <br />
+            matters
+          </h2>
+          <p data-pop="" className="mx-auto mt-6 max-w-[520px] text-center text-xl leading-snug">
+            One plan keeps every hour of study pointed at the exam, so nothing you learn goes to waste.
+          </p>
+          <div className="mt-16 grid gap-5 md:grid-cols-3">
+            {pillars.map((p, i) => (
+              <article key={p.title} data-pop="" className="rs-grain relative overflow-hidden rounded-2xl bg-[var(--rs-deep)] p-7 text-[var(--rs-saffron)]">
+                <p className="rs-small opacity-70">0{i + 1}</p>
+                <p className="rs-display mt-10 text-[42px] leading-[0.9]">{p.kicker}</p>
+                <div className="rs-dots my-6" />
+                <p className="rs-display text-[22px]">{p.title}</p>
+                <p className="mt-3 leading-snug text-[var(--rs-cream)]/80">{p.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- photo strip + marquee ---------- */}
+      <section className="rs-grain relative bg-[var(--rs-saffron)] text-[var(--rs-deep)]">
+        <div className="grid md:grid-cols-3">
+          {[
+            ["/v3/images/gallery/campus.webp", "The Vajiram & Ravi campus building"],
+            ["/hero/classroom.jpg", "Aspirants in a classroom"],
+            ["/hero/mains.jpg", "An aspirant writing a Mains answer"],
+          ].map(([src, alt], i) => (
+            <div key={src} className="relative border-[var(--rs-deep)]/25 px-7 py-16 md:border-l md:first:border-l-0">
+              <div data-tilt-photo="" className="relative aspect-[4/3] overflow-hidden rounded-xl">
+                <Image src={src} alt={alt} fill sizes="33vw" className="object-cover" priority={i === 0} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="overflow-hidden border-y-[3px] border-dotted border-[var(--rs-deep)]/40 bg-[var(--rs-orange)] py-6 text-[var(--rs-saffron)]">
+          <div className="rs-marquee" aria-hidden>
+            {Array.from({ length: 2 }, (_, k) => (
+              <p key={k} className="rs-display shrink-0 pr-10 text-[clamp(56px,9vw,150px)] whitespace-nowrap">
+                Unlock the rank inside you ✺ Prelims ✺ Mains ✺ Interview ✺{" "}
+              </p>
+            ))}
+          </div>
+          <p className="sr-only">Unlock the rank inside you: Prelims, Mains, Interview.</p>
+        </div>
+      </section>
+
+      {/* ---------- let's get preparing (recipe cards -> programmes) ---------- */}
+      <section id="programmes-draft" className="rs-grain relative overflow-hidden bg-[var(--rs-rust)] px-7 py-28">
+        <div className="relative mx-auto max-w-[var(--rs-max)]">
+          <h2 data-pop="" className="rs-display text-center text-[clamp(56px,8vw,128px)]">
+            Let&apos;s get
+            <br />
+            preparing
+          </h2>
+          <div className="mt-8 flex justify-center">
+            <Link href="/v3" className="rs-pill">
+              All programmes
+            </Link>
+          </div>
+          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {programmes.map((p) => (
+              <article key={p.name} data-pop="" className="group rounded-xl bg-[var(--rs-saffron)] p-3.5 pb-8 text-[var(--rs-deep)] transition-transform duration-500 hover:-translate-y-2 hover:rotate-[-1deg]">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-md">
+                  <Image src={p.img} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                </div>
+                <div className="mt-3 flex gap-1.5">
+                  {p.tags.map((t) => (
+                    <span key={t} className="rs-tag">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <h3 className="rs-display mt-6 text-[28px] leading-[0.92]">{p.name}</h3>
+                <p className="mt-3 text-[15px] leading-snug">{p.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* ---------- from first call to the interview board: the four steps of joining ---------- */}
+      <section id="journey" data-journey="" className="relative overflow-hidden bg-[var(--rs-cream)] px-7 py-28 text-[var(--rs-rust)]">
+        <div className="relative mx-auto max-w-[var(--rs-max)]">
+          <div className="grid gap-8 md:grid-cols-[1.25fr_1fr] md:items-end">
+            <div>
+              <p data-pop="" className="rs-small text-[14px] opacity-80">
+                <span className="l-en">Your journey with us · </span><span lang="hi" className="rs-hi normal-case">पहली कॉल से साक्षात्कार बोर्ड तक</span>
+              </p>
+              <h2 data-pop="" className="rs-display mt-4 text-[clamp(40px,4.6vw,80px)]">
+                From first call
+                <br />
+                to the <span className="text-[var(--rs-orange)]">interview board</span>
+              </h2>
+            </div>
+            <p data-pop="" className="max-w-[460px] text-xl leading-snug text-[var(--rs-deep)]/85">
+              Four steps, and a mentor beside you at each one. No part of this journey is walked alone.
+            </p>
+          </div>
+
+          <ol className="relative mt-16 grid gap-5 lg:grid-cols-4">
+            {/* the path joining the steps: draws across as the section scrolls in (desktop) */}
+            <span
+              data-journey-line=""
+              aria-hidden
+              className="rs-dots pointer-events-none absolute top-[27px] right-[12.5%] left-[12.5%] hidden origin-left lg:block"
+              style={{ "--rs-saffron": "var(--rs-rust)" } as React.CSSProperties}
+            />
+            {journey.map((j, i) => (
+              <li key={j.title} data-pop="" className="relative flex flex-col items-center">
+                <span className="rs-display relative z-10 flex size-14 items-center justify-center rounded-full bg-[var(--rs-rust)] text-[22px] leading-none text-[var(--rs-saffron)] ring-[6px] ring-[var(--rs-cream)]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <article className="mt-5 flex w-full flex-1 flex-col rounded-2xl bg-white p-7 ring-1 ring-[var(--rs-deep)]/10 shadow-[0_18px_40px_-28px_rgba(45,32,29,0.5)]">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="flex size-12 items-center justify-center rounded-xl bg-[var(--rs-saffron)] text-[var(--rs-deep)]">
+                      <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        {journeyIcons[j.icon]}
+                      </svg>
+                    </span>
+                    <span lang="hi" className="rs-hi text-[15px] opacity-70">
+                      {j.hi}
+                    </span>
+                  </div>
+                  <p className="rs-small mt-6 text-[12px] opacity-60">
+                    Step {i + 1} · {j.step}
+                  </p>
+                  <h3 className="rs-display mt-2 text-[clamp(30px,2.6vw,42px)]">{j.title}</h3>
+                  <p className="mt-3 text-[16px] leading-snug text-[var(--rs-deep)]/85">{j.text}</p>
+                  <div className="rs-dots my-6" style={{ "--rs-saffron": "var(--rs-rust)" } as React.CSSProperties} />
+                  <p className="text-[14px] leading-snug text-[var(--rs-deep)]/70">{j.meta}</p>
+                  <span className={`rs-tag mt-5 self-start ${"hot" in j && j.hot ? "!bg-[var(--rs-orange)] !text-white" : ""}`}>{j.tag}</span>
+                </article>
+              </li>
+            ))}
+          </ol>
+
+          <div data-pop="" className="mt-14 flex flex-wrap items-center justify-center gap-3">
+            <a href="#enrol" className="rs-pill !h-14 !bg-[var(--rs-rust)] !px-7 !text-[var(--rs-saffron)]">
+              Book free counselling →
+            </a>
+            <a href="tel:+918062206330" className="rs-pill !h-14 !bg-transparent !px-7 !text-[var(--rs-rust)] ring-2 ring-[var(--rs-rust)]">
+              Call 080-6220-6330
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- enrol: chat with a counsellor ---------- */}
+      <section id="enrol-draft" className="rs-grain relative overflow-hidden bg-[var(--rs-saffron)] px-7 py-28 text-[var(--rs-deep)]">
+        <SectionMotif variant="rangoli" className="!text-black/[0.09]" />
+        <div className="relative mx-auto grid max-w-[var(--rs-max)] gap-12 md:grid-cols-[1fr_1.05fr] md:items-start">
+          <div className="md:sticky md:top-28">
+            <p data-pop="" className="rs-small">
+              <span className="l-en">Admissions for 2027 are open · </span><span lang="hi" className="rs-hi normal-case">निःशुल्क परामर्श</span>
+            </p>
+            <h2 data-pop="" className="rs-display mt-4 text-[clamp(52px,7vw,120px)]">
+              Talk to a
+              <br />
+              counsellor
+            </h2>
+            <p data-pop="" className="mt-8 max-w-[440px] text-xl leading-snug">
+              Answer a few quick questions in the chat. A counsellor will call you back and help you pick the right programme.
+            </p>
+            <div className="rs-dots mt-10 max-w-[480px]" style={{ "--rs-saffron": "var(--rs-deep)" } as React.CSSProperties} />
+            <ul className="rs-small mt-6 flex flex-col gap-2 text-[13px]">
+              <li>✺ Free counselling call</li>
+              <li>✺ New Delhi · Chennai · Online</li>
+              <li>✺ English and Hindi medium</li>
+            </ul>
+            <a href="tel:+918062206330" className="rs-small mt-8 inline-block border-b-2 border-current pb-0.5 text-[13px]">
+              Prefer to call? 080-6220-6330 →
+            </a>
+          </div>
+          <div data-pop="">
+            <RecipeCounsellorChat />
+          </div>
+        </div>
+      </section>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function RecipeStory({ fontClass, hero = "faceoff", teamEntry = "plain", teamLook = "dark" }: { fontClass: string; hero?: "faceoff" | "collage"; teamEntry?: "plain" | "sweep"; teamLook?: "dark" | "collage" }) {
+  return (
+    <div className={`rs ${fontClass}`}>
+      {/* Header lives outside the smoother so it stays fixed. */}
+      <RecipeHeader />
+
+      <SmoothScroll keepHash={false} smooth={0.75}>
+        <Story hero={hero} teamEntry={teamEntry} teamLook={teamLook} />
+      </SmoothScroll>
+    </div>
+  );
+}

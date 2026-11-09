@@ -1,0 +1,28 @@
+/* ---------- Contact and campus, option C: milestones on a road + signposts (RecipeContactLocations.tsx; user 2026-11-09) ----------
+   The milestone stone is reused (.rs-ms-stone and its parts, above). Both campuses stand side by side on a road; the three channels are
+   arrow-shaped signposts. Option B (city tabs + ruled directory) is in backup/removed-sections/RecipeContactLocations.optionB-milestone-tabs.tsx.bak;
+   the .rs-ms-tab*, .rs-ms-stage and .rs-dir-* rules stay above, unused. */
+.rs-mw { position: relative; margin-top: 72px; }
+.rs-mw-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: end; justify-items: center; padding: 0 24px; }
+.rs-mw-item { width: 100%; display: flex; justify-content: center; }
+.rs-mw-item .rs-ms-stone { width: min(100%, 440px); animation: none; }
+.rs-road { position: relative; height: 58px; margin-top: -14px; border-radius: 10px; background: #2a1f1a; box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.08), 0 14px 24px -14px rgba(70, 30, 12, 0.6); overflow: hidden; }
+.rs-road::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 4px; margin-top: -2px; background: repeating-linear-gradient(90deg, var(--rs-saffron) 0 38px, transparent 38px 72px); opacity: 0.9; }
+.rs-road::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: url(/grain.png) repeat; background-size: 200px; opacity: 0.12; mix-blend-mode: screen; }
+.rs-sp { list-style: none; margin: 56px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.rs-sp-board { --bg: var(--rs-rust); --fg: var(--rs-cream); --acc: var(--rs-saffron); position: relative; isolation: isolate; display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 26px 64px 24px 28px; color: var(--fg); transition: transform 0.3s cubic-bezier(0.22, 0.9, 0.3, 1.2); }
+.rs-sp-board::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--bg); clip-path: polygon(0 0, calc(100% - 44px) 0, 100% 50%, calc(100% - 44px) 100%, 0 100%); transition: background 0.25s ease; }
+.rs-sp-board.is-saffron { --bg: var(--rs-saffron); --fg: var(--rs-deep); --acc: var(--rs-rust); }
+.rs-sp-board.is-deep { --bg: var(--rs-deep); --fg: var(--rs-cream); --acc: var(--rs-saffron); }
+.rs-sp-board:hover, .rs-sp-board:focus-visible { transform: translateX(8px); }
+.rs-sp-board:focus-visible { outline: 3px solid var(--rs-deep); outline-offset: 4px; }
+.rs-sp-label { font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--acc); }
+.rs-sp-value { font-family: var(--rs-body), sans-serif; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; font-size: clamp(22px, 2vw, 30px); overflow-wrap: anywhere; }
+.rs-sp-note { font-size: 14.5px; line-height: 1.4; opacity: 0.85; }
+.rs-sp-cta { display: inline-flex; align-items: center; gap: 8px; width: fit-content; margin-top: 10px; padding-bottom: 2px; border-bottom: 2px solid currentColor; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 14px; }
+@media (max-width: 1000px) { .rs-sp { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+  .rs-mw-grid { grid-template-columns: 1fr; gap: 36px; padding: 0; }
+  .rs-road { margin-top: -10px; }
+}
+@media (prefers-reduced-motion: reduce) { .rs-sp-board { transition: none; } }

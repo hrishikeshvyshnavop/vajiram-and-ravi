@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
+import { ARCHIVE, ARCHIVE_YEARS } from "./topperArchive";
 import Btn from "./RecipeButton";
 
 // "Meet the toppers" as a modern newspaper front page (user request 2026-11-06; restyled modern and re-laid-out 2026-11-07).
@@ -16,11 +20,67 @@ const igpCount = (list: readonly Topper[]) => list.filter((t) => t.took.some((p)
 
 const photo = (t: Topper) => `/v3/images/toppers-bw/${t.img}.webp`;
 
+// Toppers of an earlier year (user 2026-11-09: "toppers section needs to show the previous years' toppers till 2025"). The data is the official list on
+// vajiramandravi.com/ias-selections-from-vajiram (see topperArchive.ts); it has 2016 to 2025 and no 2015. Programmes are shown only where the page names them.
+function ArchiveCard({ t, small }: { t: { rank: number; name: string; programmes: string; img: string }; small?: boolean }) {
+  return (
+    <li className={`rs-yv-card ${small ? "is-small" : ""}`}>
+      <div className="rs-yv-photo">
+        {t.img ? <Image src={t.img} alt={`${t.name}, AIR ${t.rank}`} fill sizes={small ? "(min-width: 1024px) 12vw, 30vw" : "(min-width: 1024px) 16vw, 44vw"} className="object-cover object-top" /> : <span className="rs-yv-ini">{t.name.charAt(0)}</span>}
+        <span className="rs-yv-air">AIR {t.rank}</span>
+      </div>
+      <p className="rs-yv-name">{t.name}</p>
+      {t.programmes && <p className="rs-yv-prog">{t.programmes}</p>}
+    </li>
+  );
+}
+
+function MoreToppers({ year }: { year: number }) {
+  const more = (ARCHIVE[year] ?? []).filter((t) => t.rank > 10);
+  if (!more.length) return null;
+  return (
+    <details className="rs-yv-more">
+      <summary>
+        More from CSE {year} · AIR {more[0].rank} to {more[more.length - 1].rank} <span>({more.length})</span>
+      </summary>
+      <ul className="rs-yv-grid is-small">
+        {more.map((t) => (
+          <ArchiveCard key={`${t.rank}-${t.name}`} t={t} small />
+        ))}
+      </ul>
+    </details>
+  );
+}
+
+function YearView({ year }: { year: number }) {
+  const all = ARCHIVE[year] ?? [];
+  const top10 = all.filter((t) => t.rank <= 10);
+  return (
+    <div id="np-top3" className="rs-yv">
+      <div className="rs-yv-head">
+        <h3>UPSC CSE {year}</h3>
+        <p>
+          {top10.length} {top10.length === 1 ? "topper" : "toppers"} in the top 10 · {all.length} listed in all
+        </p>
+      </div>
+      <ul className="rs-yv-grid">
+        {top10.map((t) => (
+          <ArchiveCard key={`${t.rank}-${t.name}`} t={t} />
+        ))}
+      </ul>
+      <MoreToppers year={year} />
+    </div>
+  );
+}
+
 export default function RecipeToppersPaper({ toppers }: { toppers: readonly Topper[] }) {
   const top3 = toppers.slice(0, 3);
   const rest = toppers.slice(3);
   const lead = toppers[0];
   const igp = igpCount(toppers);
+  const latest = ARCHIVE_YEARS[0];
+  const [year, setYear] = useState<number>(latest);
+  const isLatest = year === latest;
 
   return (
     <section
@@ -43,15 +103,21 @@ export default function RecipeToppersPaper({ toppers }: { toppers: readonly Topp
             <span>Estd. 1976 · New Delhi</span>
           </div>
           <div className="rs-np-title">
-            <p className="rs-paper-mast text-[clamp(34px,5.6vw,84px)] leading-[0.95]">The Aspirant&apos;s Chronicle</p>
-            <p lang="hi" className="rs-hi text-[clamp(14px,1.3vw,18px)] opacity-70">
+            <p className="rs-paper-mast text-[length:var(--rs-t2)] leading-[0.95]">The Aspirant&apos;s Chronicle</p>
+            <p lang="hi" className="rs-hi text-[16px] opacity-70">
               अभ्यर्थी समाचार · सिविल सेवा परिणाम विशेषांक
             </p>
           </div>
           <nav className="rs-np-nav" aria-label="In this edition">
-            <a href="#np-top3">The top three</a>
-            <a href="#np-story">The story</a>
-            <a href="#np-rest">AIR 4 to 10</a>
+            {isLatest ? (
+              <>
+                <a href="#np-top3">The top three</a>
+                <a href="#np-story">The story</a>
+                <a href="#np-rest">AIR 4 to 10</a>
+              </>
+            ) : (
+              <a href="#np-top3">CSE {year}</a>
+            )}
             <a href="#np-brief">In brief</a>
             <a href="#enrol" className="is-cta">Admissions 2027</a>
           </nav>
@@ -60,105 +126,125 @@ export default function RecipeToppersPaper({ toppers }: { toppers: readonly Topp
         {/* ---------- banner headline ---------- */}
         <div className="rs-np-banner">
           <h2 className="rs-paper-head text-[clamp(48px,8.6vw,136px)] leading-[0.9]">Meet the toppers</h2>
-          <p className="rs-paper-deck text-[clamp(18px,1.7vw,26px)]">
-            All India Ranks 1 to 10 in the Civil Services Examination 2025, every one of them prepared with Vajiram &amp; Ravi
+          <p className="rs-paper-deck text-[length:var(--rs-lead)]">
+            {isLatest ? "All India Ranks 1 to 10 in the Civil Services Examination 2025, every one of them prepared with Vajiram & Ravi" : `Toppers of the Civil Services Examination ${year} who prepared with Vajiram & Ravi`}
           </p>
         </div>
 
-        {/* ---------- the top three: AIR 1 larger, AIR 2 and 3 beside it ---------- */}
-        <div id="np-top3" className="rs-np-top3" role="list" aria-label="All India Ranks 1, 2 and 3">
-          {top3.map((t, i) => (
-            <figure key={t.air} role="listitem" className={`rs-np-hero ${i === 0 ? "is-first" : ""}`}>
-              <div className="rs-np-hero-photo">
-                <Image
-                  src={photo(t)}
-                  alt={`${t.name}, AIR ${t.air} in CSE 2025`}
-                  fill
-                  sizes={i === 0 ? "(min-width: 1024px) 42vw, 90vw" : "(min-width: 1024px) 28vw, 90vw"}
-                  className="object-cover object-top"
-                  priority={i === 0}
-                />
-                <span className="rs-paper-badge" role="img" aria-label={`All India Rank ${t.air}`}>
-                  AIR<b>{t.air}</b>
-                </span>
+        {/* ---------- year selector: 2025 back to 2016 ---------- */}
+        <div className="rs-yr" role="group" aria-label="Toppers by year">
+          <p className="rs-yr-label">Toppers by year</p>
+          <div className="rs-yr-chips">
+            {ARCHIVE_YEARS.map((y) => (
+              <button key={y} type="button" aria-pressed={y === year} className={y === year ? "is-on" : ""} onClick={() => setYear(y)}>
+                {y}
+              </button>
+            ))}
+          </div>
+          <p className="rs-yr-note">UPSC CSE results, {ARCHIVE_YEARS[ARCHIVE_YEARS.length - 1]} to {latest}</p>
+        </div>
+
+        {isLatest ? (
+          <>
+          {/* ---------- the top three: AIR 1 larger, AIR 2 and 3 beside it ---------- */}
+          <div id="np-top3" className="rs-np-top3" role="list" aria-label="All India Ranks 1, 2 and 3">
+            {top3.map((t, i) => (
+              <figure key={t.air} role="listitem" className={`rs-np-hero ${i === 0 ? "is-first" : ""}`}>
+                <div className="rs-np-hero-photo">
+                  <Image
+                    src={photo(t)}
+                    alt={`${t.name}, AIR ${t.air} in CSE 2025`}
+                    fill
+                    sizes={i === 0 ? "(min-width: 1024px) 42vw, 90vw" : "(min-width: 1024px) 28vw, 90vw"}
+                    className="object-cover object-top"
+                    priority={i === 0}
+                  />
+                  <span className="rs-paper-badge" role="img" aria-label={`All India Rank ${t.air}`}>
+                    AIR<b>{t.air}</b>
+                  </span>
+                </div>
+                <figcaption className="rs-np-hero-cap">
+                  <p className="rs-paper-kicker">{i === 0 ? "All India Rank 1" : `All India Rank ${t.air}`}</p>
+                  <p className="rs-np-hero-name">{t.name}</p>
+                  <p className="rs-paper-caption">Prepared with the {t.took.join(", ")}.</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+
+          {/* ---------- the story, with numbers and the admissions ad in a side rail ---------- */}
+          <div id="np-story" className="rs-np-story">
+            <article className="rs-np-article">
+              <p className="rs-paper-kicker">The story</p>
+              <h3 className="rs-paper-head text-[length:var(--rs-t2)] leading-[1.02]">Nine of the top ten trained for the interview board at V&amp;R</h3>
+              <p className="rs-paper-by mt-3">Vajiram &amp; Ravi · New Delhi</p>
+              <div className="rs-paper-body rs-np-cols mt-4">
+                <p className="rs-np-lede">
+                  The final result of the UPSC Civil Services Examination 2025 places all ten of the top All India Ranks with aspirants who prepared at Vajiram &amp; Ravi.
+                </p>
+                <p>
+                  {lead.name} heads the list at AIR 1, having prepared for the Personality Test with the institute&apos;s Interview Guidance Programme (IGP).
+                </p>
+                <p>
+                  {igp} of the ten went through IGP before facing the board. {toppers[2]?.name}, AIR 3, came through the classroom GS Prelims cum Mains programme.
+                </p>
+                <p>Their programmes ranged from the PowerUp Prelims and Mains test series to Sociology optional coaching and the GS Ethics module.</p>
               </div>
-              <figcaption className="rs-np-hero-cap">
-                <p className="rs-paper-kicker">{i === 0 ? "All India Rank 1" : `All India Rank ${t.air}`}</p>
-                <p className="rs-np-hero-name">{t.name}</p>
-                <p className="rs-paper-caption">Prepared with the {t.took.join(", ")}.</p>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+            </article>
 
-        {/* ---------- the story, with numbers and the admissions ad in a side rail ---------- */}
-        <div id="np-story" className="rs-np-story">
-          <article className="rs-np-article">
-            <p className="rs-paper-kicker">The story</p>
-            <h3 className="rs-paper-head text-[clamp(28px,3vw,46px)] leading-[1.02]">Nine of the top ten trained for the interview board at V&amp;R</h3>
-            <p className="rs-paper-by mt-3">Vajiram &amp; Ravi · New Delhi</p>
-            <div className="rs-paper-body rs-np-cols mt-4">
-              <p className="rs-np-lede">
-                The final result of the UPSC Civil Services Examination 2025 places all ten of the top All India Ranks with aspirants who prepared at Vajiram &amp; Ravi.
-              </p>
-              <p>
-                {lead.name} heads the list at AIR 1, having prepared for the Personality Test with the institute&apos;s Interview Guidance Programme (IGP).
-              </p>
-              <p>
-                {igp} of the ten went through IGP before facing the board. {toppers[2]?.name}, AIR 3, came through the classroom GS Prelims cum Mains programme.
-              </p>
-              <p>Their programmes ranged from the PowerUp Prelims and Mains test series to Sociology optional coaching and the GS Ethics module.</p>
-            </div>
-          </article>
-
-          <aside className="rs-np-rail">
-            <div className="rs-paper-box">
-              <p className="rs-paper-kicker">In numbers</p>
-              <dl className="mt-2">
-                <div className="rs-paper-stat">
-                  <dt className="rs-paper-head text-[48px] leading-none">10/10</dt>
-                  <dd>of the top ten All India Ranks prepared with V&amp;R</dd>
-                </div>
-                <div className="rs-paper-stat">
-                  <dt className="rs-paper-head text-[48px] leading-none">{igp}</dt>
-                  <dd>of the ten took the Interview Guidance Programme</dd>
-                </div>
-                <div className="rs-paper-stat">
-                  <dt className="rs-paper-head text-[48px] leading-none">1976</dt>
-                  <dd>the year Vajiram &amp; Ravi began preparing aspirants</dd>
-                </div>
-              </dl>
-            </div>
-
-            <a href="#enrol" className="rs-paper-ad group">
-              <span className="rs-paper-kicker">Admissions</span>
-              <span className="rs-paper-head mt-2 block text-[28px] leading-[1]">Admissions open for 2027</span>
-              <span className="rs-paper-body mt-2 block">Classroom &amp; online GS Prelims cum Mains. English and Hindi medium. New Delhi · Chennai.</span>
-              <Btn as="span" variant="ink" className="mt-4">Book a free counselling call</Btn>
-            </a>
-          </aside>
-        </div>
-
-        {/* ---------- AIR 4-10 ---------- */}
-        <div id="np-rest" className="rs-np-sec">
-          <p className="rs-paper-kicker">The rest of the top ten</p>
-          <p className="rs-np-sec-sub">AIR 4 to 10</p>
-        </div>
-        <ul className="rs-np-rest">
-          {rest.map((t) => (
-            <li key={t.air} className="rs-np-card">
-              <div className="rs-np-card-photo">
-                <Image src={photo(t)} alt={`${t.name}, AIR ${t.air} in CSE 2025`} fill sizes="(min-width: 1024px) 14vw, 44vw" className="object-cover object-top" />
+            <aside className="rs-np-rail">
+              <div className="rs-paper-box">
+                <p className="rs-paper-kicker">In numbers</p>
+                <dl className="mt-2">
+                  <div className="rs-paper-stat">
+                    <dt className="rs-paper-head text-[48px] leading-none">10/10</dt>
+                    <dd>of the top ten All India Ranks prepared with V&amp;R</dd>
+                  </div>
+                  <div className="rs-paper-stat">
+                    <dt className="rs-paper-head text-[48px] leading-none">{igp}</dt>
+                    <dd>of the ten took the Interview Guidance Programme</dd>
+                  </div>
+                  <div className="rs-paper-stat">
+                    <dt className="rs-paper-head text-[48px] leading-none">1976</dt>
+                    <dd>the year Vajiram &amp; Ravi began preparing aspirants</dd>
+                  </div>
+                </dl>
               </div>
-              <p className="rs-np-card-air">AIR {t.air}</p>
-              <p className="rs-paper-caption">
-                <b>{t.name}</b>
-                <br />
-                {t.took.join(" · ")}
-              </p>
-            </li>
-          ))}
-        </ul>
+
+              <a href="#enrol" className="rs-paper-ad group">
+                <span className="rs-paper-kicker">Admissions</span>
+                <span className="rs-paper-head mt-2 block text-[28px] leading-[1]">Admissions open for 2027</span>
+                <span className="rs-paper-body mt-2 block">Classroom &amp; online GS Prelims cum Mains. English and Hindi medium. New Delhi · Chennai.</span>
+                <Btn as="span" variant="ink" className="mt-4">Book a free counselling call</Btn>
+              </a>
+            </aside>
+          </div>
+
+          {/* ---------- AIR 4-10 ---------- */}
+          <div id="np-rest" className="rs-np-sec">
+            <p className="rs-paper-kicker">The rest of the top ten</p>
+            <p className="rs-np-sec-sub">AIR 4 to 10</p>
+          </div>
+          <ul className="rs-np-rest">
+            {rest.map((t) => (
+              <li key={t.air} className="rs-np-card">
+                <div className="rs-np-card-photo">
+                  <Image src={photo(t)} alt={`${t.name}, AIR ${t.air} in CSE 2025`} fill sizes="(min-width: 1024px) 14vw, 44vw" className="object-cover object-top" />
+                </div>
+                <p className="rs-np-card-air">AIR {t.air}</p>
+                <p className="rs-paper-caption">
+                  <b>{t.name}</b>
+                  <br />
+                  {t.took.join(" · ")}
+                </p>
+              </li>
+            ))}
+          </ul>
+            <MoreToppers year={latest} />
+          </>
+        ) : (
+          <YearView year={year} />
+        )}
 
         {/* ---------- in brief: four short items, facts only (domain overview / site copy) ---------- */}
         <div id="np-brief" className="rs-np-sec">

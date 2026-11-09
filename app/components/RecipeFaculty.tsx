@@ -112,7 +112,7 @@ export default function RecipeFaculty({ specialists }: { specialists: readonly S
         <div className="grid gap-8 md:grid-cols-[1.4fr_1fr] md:items-end">
           <div>
             <p data-pop="" className="rs-small text-[14px] opacity-80">
-              Faculty · <span lang="hi" className="rs-hi normal-case">विषय विशेषज्ञ</span>
+              <span className="l-en">Faculty · </span><span lang="hi" className="rs-hi normal-case">विषय विशेषज्ञ</span>
             </p>
             <h2 data-pop="" className="rs-display mt-4 text-[clamp(44px,5.4vw,96px)]">
               Learn from the
@@ -142,16 +142,16 @@ export default function RecipeFaculty({ specialists }: { specialists: readonly S
                 <article data-card="" className="rs-idcard">
                   <span className="rs-idcard-slot" aria-hidden />
                   <header className="rs-idcard-head">
-                    <span className="rs-display text-[15px] leading-none">Vajiram &amp; Ravi</span>
-                    <span className="rs-small text-[9px] tracking-[0.2em] opacity-80">Faculty</span>
+                    <span className="rs-display text-[16px] leading-none">Vajiram &amp; Ravi</span>
+                    <span className="rs-small text-[12px] tracking-[0.2em] opacity-80">Faculty</span>
                   </header>
                   <div className="relative mx-auto mt-3 aspect-square w-[72%] overflow-hidden rounded-md bg-[var(--rs-cream)] ring-2 ring-[var(--rs-rust)]">
                     <Image src={`/v3/images/faculty/${f.img}.webp`} alt={`${f.name}, ${f.subject} faculty at Vajiram & Ravi`} fill sizes="(min-width: 1280px) 12vw, 30vw" className="object-cover object-top" />
                   </div>
-                  <h3 className="rs-display mt-3 px-2 text-center text-[clamp(17px,1.35vw,21px)] leading-[1.02]">{f.name}</h3>
-                  <p className="mt-1 text-center text-[12.5px] font-semibold">{f.subject}</p>
-                  <p className="text-center text-[11.5px] opacity-70">{f.detail}</p>
-                  <p lang="hi" className="rs-hi mt-1 text-center text-[11px] opacity-70">
+                  <h3 className="rs-display mt-3 px-2 text-center text-[length:var(--rs-lead)] leading-[1.02]">{f.name}</h3>
+                  <p className="mt-1 text-center text-[13px] font-semibold">{f.subject}</p>
+                  <p className="text-center text-[12px] opacity-70">{f.detail}</p>
+                  <p lang="hi" className="rs-hi mt-1 text-center text-[12px] opacity-70">
                     विषय विशेषज्ञ
                   </p>
                   <footer className="rs-idcard-foot">
@@ -160,7 +160,7 @@ export default function RecipeFaculty({ specialists }: { specialists: readonly S
                         <rect key={b.x} x={b.x} y="0" width={b.w} height="22" fill="currentColor" />
                       ))}
                     </svg>
-                    <span className="mt-1 block text-center font-mono text-[9px] tracking-[0.18em]">VR-1976-{String(i + 1).padStart(3, "0")}</span>
+                    <span className="mt-1 block text-center font-mono text-[12px] tracking-[0.18em]">VR-1976-{String(i + 1).padStart(3, "0")}</span>
                   </footer>
                 </article>
               </div>

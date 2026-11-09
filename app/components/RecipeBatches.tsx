@@ -2,6 +2,7 @@
 
 import Btn from "./RecipeButton";
 import { useEffect, useState } from "react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // Upcoming batches (storyline section 8: docs/STORYLINE_HOMEPAGE.md).
 //   Q5 "When can I start?"  ->  dated batches, filterable by track, the flagship first, a live seat meter and a Register
@@ -78,60 +79,74 @@ function Meter({ left, total, dark }: { left: number; total: number; dark?: bool
 }
 
 const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const startOf = (b: Batch) => new Date(b.year, MONTHS.indexOf(b.month), b.day, 9, 0, 0); // classes assumed to open at 9 AM
-const when = (b: Batch) => startOf(b).getTime();
-const label = (b: Batch) => `${b.day} ${MONTH_NAMES[MONTHS.indexOf(b.month)]} ${b.year}`;
-const pad = (n: number) => String(n).padStart(2, "0");
+const when = (b: Batch) => new Date(b.year, MONTHS.indexOf(b.month), b.day, 9, 0, 0).getTime();
 
-// One flip tile of the countdown. Shows dashes until the clock has started (the server cannot know the visitor's "now").
-function Tile({ value, unit }: { value: number | null; unit: string }) {
+// The seat map: one dot per seat, the taken ones filled, so how full the batch is reads at a glance. Seat counts are the sample figures
+// (see SHOW_SAMPLE_NOTE above). The text under it carries the same information for screen readers.
+function SeatMap({ left, total }: { left: number; total: number }) {
+  const taken = total - left;
   return (
-    <div className="rs-cd-tile">
-      <b>{value === null ? "--" : pad(value)}</b>
-      <span>{unit}</span>
+    <div className="rs-fb-map">
+      <div className="rs-fb-dots" aria-hidden>
+        {Array.from({ length: total }, (_, i) => (
+          <i key={i} className={i < taken ? "is-taken" : ""} />
+        ))}
+      </div>
+      <p className="rs-fb-left">
+        <b>{left}</b> of {total} seats left
+        {left / total <= 0.25 && <span className="rs-bt-fast">Filling fast</span>}
+      </p>
+      <p className="rs-fb-key" aria-hidden><i className="is-taken" /> taken <i /> open</p>
     </div>
   );
 }
 
-// A later batch, as a stop on the timeline under the countdown.
-function Stop({ b, after }: { b: Batch; after: number }) {
+// A batch that is not the featured one: a compact row.
+function Row({ b, hidden }: { b: Batch; hidden: boolean }) {
+  // Rows are never removed when a tab is picked: a filtered-out row collapses and fades in place, so the page height eases instead of jumping.
+  // (visibility:hidden, set in CSS after the collapse, also takes its Register link out of the tab order.)
   return (
-    <li data-pop="" className={`rs-cd-stop ${b.flagship ? "is-flagship" : ""}`}>
-      <span className="rs-cd-dot" aria-hidden />
-      <div className="rs-cd-when">
-        <b>{b.day} {b.month}</b>
-        <small>{after > 0 ? `+${after} day${after > 1 ? "s" : ""}` : "same day"}</small>
+    <li data-pop="" className={`rs-fb-item ${hidden ? "is-hidden" : ""}`}>
+      <div className="rs-fb-collapse">
+        <div className="rs-fb-collapse-in">
+          <div className="rs-fb-row">
+            <div className="rs-fb-rdate" aria-label={`Starts ${b.day} ${b.month} ${b.year}`}>
+              <span>{b.month}</span>
+              <b>{b.day}</b>
+            </div>
+            <div className="rs-fb-rmain">
+              <p className="rs-fb-rtag">{b.track} · {b.target}</p>
+              <h3>{b.title}</h3>
+              <p>{b.summary}</p>
+            </div>
+            <div className="rs-fb-rseats">
+              <Meter left={b.seats.left} total={b.seats.total} />
+            </div>
+            <Btn href="#enrol" variant="ink" size="sm" className="rs-fb-rreg">Register</Btn>
+          </div>
+        </div>
       </div>
-      <div className="rs-cd-what">
-        <h4>{b.title}</h4>
-        <p>{b.flagship ? "Flagship" : b.track} · {b.target} · {b.seats.left} of {b.seats.total} seats left</p>
-      </div>
-      <Btn href="#enrol" variant="light" size="sm" className="rs-cd-reg">Register</Btn>
     </li>
   );
 }
 
 export default function RecipeBatches() {
   const [filter, setFilter] = useState<Filter>("All");
+  // switching tabs only fades the results in, gently and without movement; it is off until the first click so the page's scroll-in is unchanged
+  const [switched, setSwitched] = useState(false);
   const visible = batches.filter((b) => filter === "All" || b.track === filter).sort((x, y) => when(x) - when(y));
-  // the clock starts after mount, so server and browser markup match; it ticks once a second
-  const [now, setNow] = useState<number | null>(null);
+  // the featured batch is the flagship; if a filter hides it, the earliest batch left
+  const featured = visible.find((b) => b.flagship) ?? visible[0];
+  const others = visible.filter((b) => b !== featured);
+  const matches = (b: Batch) => filter === "All" || b.track === filter;
+  const ordered = [...batches].sort((x, y) => when(x) - when(y));
+  const hasOthers = others.length > 0;
+
+  // the page height changes a little with each tab; once the collapse has finished, tell the scroll animations to re-measure
   useEffect(() => {
-    setNow(Date.now());
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-  // the next batch is the first one still ahead; if every date has passed, show the earliest and no countdown
-  const upcoming = now === null ? visible : visible.filter((b) => when(b) > now);
-  const next = upcoming[0] ?? visible[0];
-  const rest = visible.filter((b) => b !== next);
-  const left = next && now !== null ? Math.max(0, when(next) - now) : null;
-  const d = left === null ? null : Math.floor(left / 86400000);
-  const h = left === null ? null : Math.floor(left / 3600000) % 24;
-  const m = left === null ? null : Math.floor(left / 60000) % 60;
-  const sec = left === null ? null : Math.floor(left / 1000) % 60;
-  const DAY = 86400000;
+    const t = setTimeout(() => ScrollTrigger.refresh(), 450);
+    return () => clearTimeout(t);
+  }, [filter]);
 
   return (
     <section id="batches" className="relative overflow-hidden bg-[var(--rs-cream)] px-7 py-28 text-[var(--rs-deep)]">
@@ -139,7 +154,7 @@ export default function RecipeBatches() {
         <div className="flex flex-wrap items-end justify-between gap-8">
           <div>
             <p data-pop="" className="rs-small text-[14px] text-[var(--rs-rust)]">
-              Admissions open · 2027 · <span lang="hi" className="rs-hi normal-case">प्रवेश</span>
+              <span className="l-en">Admissions open · 2027 · </span><span lang="hi" className="rs-hi normal-case">प्रवेश</span>
             </p>
             <h2 data-pop="" className="rs-display mt-4 text-[clamp(52px,6.6vw,108px)]">
               Next batches
@@ -154,7 +169,7 @@ export default function RecipeBatches() {
           </div>
           <div data-pop="" role="group" aria-label="Filter batches" className="flex flex-wrap gap-2">
             {FILTERS.filter((f) => countFor(f) > 0).map((f) => (
-              <button key={f} type="button" aria-pressed={f === filter} onClick={() => setFilter(f)} className={`rs-bt-chip ${f === filter ? "is-on" : ""}`}>
+              <button key={f} type="button" aria-pressed={f === filter} onClick={() => { setFilter(f); setSwitched(true); }} className={`rs-bt-chip ${f === filter ? "is-on" : ""}`}>
                 {f}
                 <span>{countFor(f)}</span>
               </button>
@@ -162,33 +177,45 @@ export default function RecipeBatches() {
           </div>
         </div>
 
-        {next ? (
-          <div className="rs-cd">
-            <div data-pop="" className="rs-cd-hero">
-              <p className="rs-cd-kicker">{next.flagship ? "Flagship batch" : "Next batch"} starts in</p>
-              <div className="rs-cd-clock" role="timer" aria-label={left === null ? "Countdown" : `${d} days, ${h} hours and ${m} minutes to the next batch`}>
-                <Tile value={d} unit="Days" />
-                <Tile value={h} unit="Hours" />
-                <Tile value={m} unit="Minutes" />
-                <Tile value={sec} unit="Seconds" />
+        {featured ? (
+          <>
+            {/* the featured batch: the banner stays; only the text inside crossfades when the featured batch changes */}
+            <article data-pop="" className="rs-fb-feature">
+              <div key={featured.title} className={`rs-fb-fgrid ${switched ? "rs-fb-swap" : ""}`}>
+                <div className="rs-fb-fmain">
+                  <p className="rs-fb-ftag">
+                    <span className="rs-tag">{featured.flagship ? "Flagship" : featured.track}</span>
+                    <span>Starts {featured.day} {featured.month} {featured.year}</span>
+                  </p>
+                  <h3>{featured.title}</h3>
+                  <p className="rs-fb-fsum">{featured.summary}</p>
+                  <dl className="rs-fb-facts">
+                    <div><dt>Programme</dt><dd>{featured.programme}</dd></div>
+                    <div><dt>Target</dt><dd>{featured.target}</dd></div>
+                    <div><dt>Mode</dt><dd>{featured.mode}</dd></div>
+                  </dl>
+                  <div className="rs-fb-actions">
+                    <Btn href="#enrol" variant="ink">Register for this batch</Btn>
+                    <a href="tel:+918062206330" className="rs-fb-call">or call 080-6220-6330</a>
+                  </div>
+                </div>
+                <SeatMap left={featured.seats.left} total={featured.seats.total} />
               </div>
-              <p className="rs-cd-date">{label(next)} · 9 AM</p>
-              <h3 className="rs-cd-title">{next.title}</h3>
-              <p className="rs-cd-sum">{next.summary}</p>
-              <Meter left={next.seats.left} total={next.seats.total} dark />
-              <p className="rs-cd-facts">{next.programme} · {next.target} · {next.mode}</p>
-              <Btn href="#enrol" variant="saffron" className="rs-cd-go">Register for this batch</Btn>
-            </div>
+            </article>
 
-            <div className="rs-cd-after">
-              <p data-pop="" className="rs-cd-after-h">{rest.length ? "Then" : "No other batches under this filter"}</p>
-              <ol className="rs-cd-line">
-                {rest.map((b) => (
-                  <Stop key={`${b.day}-${b.title}`} b={b} after={Math.round((when(b) - when(next)) / DAY)} />
-                ))}
-              </ol>
+            <div className={`rs-fb-also-wrap ${hasOthers ? "" : "is-hidden"}`}>
+              <div className="rs-fb-collapse">
+                <div className="rs-fb-collapse-in">
+                  <p data-pop="" className="rs-fb-also">Also starting soon</p>
+                </div>
+              </div>
             </div>
-          </div>
+            <ul className="rs-fb-list">
+              {ordered.map((b) => (
+                <Row key={b.title} b={b} hidden={!matches(b) || b === featured} />
+              ))}
+            </ul>
+          </>
         ) : (
           <p className="mt-12 text-xl">No batches under this filter.</p>
         )}

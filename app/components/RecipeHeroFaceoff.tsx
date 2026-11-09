@@ -57,6 +57,7 @@ export default function RecipeHeroFaceoff({ toppers }: { toppers: readonly HeroT
       tl.from("[data-face='l']", { xPercent: -30, autoAlpha: 0, duration: 1.6 }, 0)
         .from("[data-face='r']", { xPercent: 30, autoAlpha: 0, duration: 1.6 }, 0)
         .from("[data-light]", { autoAlpha: 0, rotate: -20, duration: 2.2, ease: "power2.out" }, 0)
+        .from("[data-hero-kicker]", { autoAlpha: 0, y: 14, duration: 0.8 }, 0.15)
         .from("[data-hero-char]", { yPercent: 110, duration: 1.1, stagger: 0.05 }, 0.35)
         .from("[data-hero-sub]", { yPercent: 100, autoAlpha: 0, duration: 0.9, stagger: 0.1 }, 0.8)
         .from("[data-hero-cta] > *", { autoAlpha: 0, y: 16, duration: 0.6, stagger: 0.08 }, 1.25);
@@ -106,7 +107,13 @@ export default function RecipeHeroFaceoff({ toppers }: { toppers: readonly HeroT
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1100px] flex-col items-center justify-center px-6 pt-[120px] pb-16 text-center">
-        <h1 data-hero-title="" className="rs-fo-title mt-6" aria-label={`Toppers of CSE 2025: ${air1.name}, AIR 1, and ${air2.name}, AIR 2, prepared with Vajiram & Ravi`}>
+        {/* the institute's name leads the text block (user 2026-11-09), then the title and the lines under it */}
+        <p data-hero-kicker="" className="rs-fo-kicker">
+          <span aria-hidden />
+          <b>Vajiram &amp; Ravi</b><i className="rs-fo-kx"> · UPSC coaching</i> · since 1976
+          <span aria-hidden />
+        </p>
+        <h1 data-hero-title="" className="rs-fo-title mt-5" aria-label={`Toppers of CSE 2025: ${air1.name}, AIR 1, and ${air2.name}, AIR 2, prepared with Vajiram & Ravi`}>
           <span className="relative block" aria-hidden>
             <TitleLines animate />
           </span>
@@ -123,9 +130,6 @@ export default function RecipeHeroFaceoff({ toppers }: { toppers: readonly HeroT
               Let&apos;s get you to the same answer.
             </span>
           </span>
-        </p>
-        <p lang="hi" className="rs-hi mt-3 text-[15px] tracking-wide text-[var(--rs-cream)]/65">
-          वही सवाल, वही शुरुआत · अब आपकी बारी
         </p>
 
         <div data-hero-cta="" className="mt-9 flex flex-wrap items-center justify-center gap-4">

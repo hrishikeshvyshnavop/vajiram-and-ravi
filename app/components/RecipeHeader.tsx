@@ -8,6 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { columns, type Item } from "./RecipeFooter";
 import { Roll } from "./Roll";
 import { ArrowUpRight, CloseIcon, PhoneIcon } from "./BtnIcons";
+import LangSwitch from "./LangSwitch";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -118,14 +119,55 @@ export default function RecipeHeader() {
     setOpen(null);
     setSheet(false);
   };
-  const m = open !== null ? menus[open] : null;
+  const [last, setLast] = useState(0); // the menu whose content the panel holds (it stays while the panel fades out)
+  const m = menus[last];
+
+  // The dropdown opens under the menu item that was used (not centred on the page): its left edge follows the item and is kept inside the screen.
+  const triggers = useRef<(HTMLButtonElement | null)[]>([]);
+  const [anchor, setAnchor] = useState(28);
+  const openMenu = (i: number) => {
+    const r = triggers.current[i]?.getBoundingClientRect();
+    if (r) {
+      const w = Math.min(860, window.innerWidth - 56);
+      setAnchor(Math.round(Math.max(28, Math.min(r.left - 20, window.innerWidth - w - 28))));
+    }
+    cancelClose();
+    setLast(i);
+    setOpen(i);
+  };
+
+  // Seamless dropdown (user 2026-11-09: "when user hovers on the navigation the dropdown expands and collapses based on the content, make it seamless"):
+  // one persistent panel. Moving between menu items slides it to the new item, eases its height to the new content (measured with a ResizeObserver),
+  // and crossfades the content; nothing closes and reopens. A short close delay stops it flickering when the pointer briefly leaves.
+  const [panelH, setPanelH] = useState<number | undefined>(undefined);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelClose = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = null;
+  };
+  const scheduleClose = () => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => setOpen(null), 180);
+  };
+  useEffect(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setPanelH(el.offsetHeight));
+    ro.observe(el);
+    setPanelH(el.offsetHeight);
+    return () => {
+      ro.disconnect();
+      cancelClose();
+    };
+  }, []);
 
   return (
-    <header ref={headerRef} className={`rs-hdr fixed inset-x-0 top-0 z-50 ${scrolled || open !== null ? "is-solid" : ""}`} onMouseLeave={() => setOpen(null)}>
+    <header ref={headerRef} className={`rs-hdr fixed inset-x-0 top-0 z-50 ${scrolled || open !== null ? "is-solid" : ""}`} onMouseLeave={scheduleClose} onMouseEnter={cancelClose}>
       <div className="relative mx-auto grid h-[72px] max-w-[var(--rs-max)] grid-cols-[1fr_auto_1fr] items-center gap-4 px-7">
 
         {/* Left: the dropdown menus */}
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Courses and exam">
+        <nav className="hidden items-center gap-1 xl:flex" aria-label="Courses and exam">
           {menus.map((menu, i) => (
             <button
               key={menu.label}
@@ -133,8 +175,11 @@ export default function RecipeHeader() {
               className={`rs-hdr-link ${open === i ? "is-on" : ""}`}
               aria-expanded={open === i}
               aria-controls="rs-mega"
-              onClick={() => setOpen(open === i ? null : i)}
-              onMouseEnter={() => setOpen(i)}
+              ref={(el) => {
+                triggers.current[i] = el;
+              }}
+              onClick={() => (open === i ? setOpen(null) : openMenu(i))}
+              onMouseEnter={() => openMenu(i)}
             >
               <Roll text={menu.label} />
               <svg viewBox="0 0 12 12" className={`size-2.5 shrink-0 transition-transform duration-300 ease-out ${open === i ? "-rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -143,7 +188,7 @@ export default function RecipeHeader() {
             </button>
           ))}
         </nav>
-        <div className="lg:hidden">
+        <div className="xl:hidden">
           <button type="button" className="rs-hdr-link" aria-expanded={sheet} aria-controls="rs-sheet" onClick={() => setSheet(true)}>
             <Roll text="Menu" />
           </button>
@@ -152,12 +197,12 @@ export default function RecipeHeader() {
         <Link href="/" className="rs-hdr-logo justify-self-center" aria-label="Vajiram & Ravi, home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/vajiram-ravi-emblem.svg" alt="" className="w-8" />
-          <span>Vajiram &amp; Ravi</span>
+          <span className="hidden min-[400px]:inline">Vajiram &amp; Ravi</span>
         </Link>
 
         {/* Right: the direct links, then the one primary action */}
         <div className="flex items-center justify-self-end gap-1">
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Sections">
+          <nav className="hidden items-center gap-1 xl:flex" aria-label="Sections">
           {direct.map((d) => (
             <a key={d.label} href={d.href} className="rs-hdr-link" onMouseEnter={() => setOpen(null)}>
               <Roll text={d.label} />
@@ -168,6 +213,8 @@ export default function RecipeHeader() {
           </a>
           </nav>
 
+          <LangSwitch className="mx-1 rs-lang--bar" />
+
           {/* the one primary action */}
           <Btn href="#enrol" variant="saffron" size="sm" className="rs-hdr-btn" ariaLabel="Enrol for 2027">
             <span className="hidden sm:inline">Enrol for 2027</span>
@@ -176,38 +223,49 @@ export default function RecipeHeader() {
         </div>
       </div>
 
-      {/* Desktop dropdown panel */}
+      {/* Desktop dropdown panel: the wrapper follows the item and fades (its 4px of top padding is part of it, so the pointer never crosses a gap); the panel eases its height */}
       <div
-        id="rs-mega"
-        className={`absolute top-[calc(100%+4px)] left-1/2 hidden -translate-x-1/2 w-[min(860px,calc(100vw-56px))] origin-top rounded-2xl bg-[var(--rs-cream)] p-7 text-[var(--rs-deep)] shadow-[0_30px_60px_-20px_rgba(20,6,2,0.55)] transition-all duration-300 lg:block ${
-          m ? "visible scale-100 opacity-100" : "invisible scale-95 opacity-0"
-        }`}
+        className={`absolute top-full hidden w-[min(860px,calc(100vw-56px))] pt-1 xl:block ${open !== null ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1.5 opacity-0"}`}
+        style={{
+          left: anchor,
+          transition: open !== null ? "left .38s cubic-bezier(.4,0,.2,1), opacity .2s ease, transform .25s ease" : "opacity .16s ease, transform .16s ease, visibility 0s linear .16s",
+        }}
       >
-        {m && (
-          <div className={`grid gap-8 ${m.feature ? "grid-cols-[1fr_240px]" : "grid-cols-1"}`}>
-            <div className={`grid gap-8 ${m.groups.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
-              {m.groups.map((g) => (
-                <div key={g.title}>
-                  <p className="rs-small text-[11px] opacity-60">{g.title}</p>
-                  <ul className={`mt-3 grid gap-x-6 gap-y-1 ${m.groups.length === 1 && g.links.length > 5 ? "grid-cols-2" : "grid-cols-1"}`}>
-                    {g.links.map((l) => (
-                      <li key={l.label}>
-                        <A item={l} onClick={close} className="block rounded-lg px-2 py-1.5 -mx-2 text-[15px] transition-colors hover:bg-[var(--rs-saffron)]/40" />
-                      </li>
-                    ))}
-                  </ul>
+        <div
+          id="rs-mega"
+          className="overflow-hidden rounded-2xl bg-[var(--rs-cream)] text-[var(--rs-deep)] shadow-[0_30px_60px_-20px_rgba(20,6,2,0.55)]"
+          style={{ height: panelH, transition: open !== null ? "height .38s cubic-bezier(.4,0,.2,1)" : "none" }}
+        >
+          <div ref={innerRef} className="p-7">
+            <div key={last} className="rs-mega-fade">
+            {m && (
+              <div className={`grid gap-8 ${m.feature ? "grid-cols-[1fr_240px]" : "grid-cols-1"}`}>
+                <div className={`grid gap-8 ${m.groups.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
+                  {m.groups.map((g) => (
+                    <div key={g.title}>
+                      <p className="rs-small text-[12px] opacity-60">{g.title}</p>
+                      <ul className={`mt-3 grid gap-x-6 gap-y-1 ${m.groups.length === 1 && g.links.length > 5 ? "grid-cols-2" : "grid-cols-1"}`}>
+                        {g.links.map((l) => (
+                          <li key={l.label}>
+                            <A item={l} onClick={close} className="block rounded-lg px-2 py-1.5 -mx-2 text-[16px] transition-colors hover:bg-[var(--rs-saffron)]/40" />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            {m.feature && (
-              <a href={m.feature.href} onClick={close} className="rs-grain relative flex flex-col justify-between overflow-hidden rounded-xl bg-[var(--rs-rust)] p-5 text-[var(--rs-saffron)] transition-transform hover:-rotate-1">
-                <span className="rs-small text-[11px] opacity-70">{m.feature.kicker}</span>
-                <span className="rs-display mt-6 text-[26px] leading-[0.95]">{m.feature.title}</span>
-                <span className="rs-small mt-4 text-[11px]">Explore →</span>
-              </a>
+                {m.feature && (
+                  <a href={m.feature.href} onClick={close} className="rs-grain relative flex flex-col justify-between overflow-hidden rounded-xl bg-[var(--rs-rust)] p-5 text-[var(--rs-saffron)] transition-transform hover:-rotate-1">
+                    <span className="rs-small text-[12px] opacity-70">{m.feature.kicker}</span>
+                    <span className="rs-display mt-6 text-[28px] leading-[0.95]">{m.feature.title}</span>
+                    <span className="rs-small mt-4 text-[12px]">Explore →</span>
+                  </a>
+                )}
+              </div>
             )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Mobile / tablet sheet */}
@@ -216,7 +274,7 @@ export default function RecipeHeader() {
         role="dialog"
         aria-modal="true"
         aria-label="Menu"
-        className={`fixed inset-0 z-[60] overflow-y-auto bg-[var(--rs-deep)] px-7 pt-5 pb-10 text-[var(--rs-saffron)] transition-transform duration-500 lg:hidden ${sheet ? "translate-y-0" : "invisible -translate-y-full"}`}
+        className={`fixed inset-0 z-[60] overflow-y-auto bg-[var(--rs-deep)] px-7 pt-5 pb-10 text-[var(--rs-saffron)] transition-transform duration-500 xl:hidden ${sheet ? "translate-y-0" : "invisible -translate-y-full"}`}
       >
         <div className="flex items-center justify-between">
           <span className="rs-display text-[22px] leading-[0.85]">
@@ -229,12 +287,17 @@ export default function RecipeHeader() {
             <CloseIcon />
           </button>
         </div>
+        {/* on phones under 480px the language switch lives here, because the bar has no room for it */}
+        <div className="mt-6 flex items-center gap-3 text-[var(--rs-cream)] min-[480px]:hidden">
+          <span className="rs-small text-[12px] opacity-80">Language</span>
+          <LangSwitch />
+        </div>
         <ul className="mt-8">
           {menus.map((menu, i) => {
             const on = sheetGroup === i;
             return (
               <li key={menu.label} className="border-b border-[var(--rs-saffron)]/20">
-                <button type="button" className="rs-display flex w-full items-center justify-between py-4 text-left text-[30px]" aria-expanded={on} onClick={() => setSheetGroup(on ? null : i)}>
+                <button type="button" className="rs-display flex w-full items-center justify-between py-4 text-left text-[32px]" aria-expanded={on} onClick={() => setSheetGroup(on ? null : i)}>
                   {menu.label}
                   <span className={`text-[20px] transition-transform ${on ? "rotate-45" : ""}`} aria-hidden>
                     +
@@ -254,7 +317,7 @@ export default function RecipeHeader() {
           })}
           {direct.map((d) => (
             <li key={d.label} className="border-b border-[var(--rs-saffron)]/20">
-              <A item={d} onClick={close} className="rs-display block py-4 text-[30px]" />
+              <A item={d} onClick={close} className="rs-display block py-4 text-[32px]" />
             </li>
           ))}
         </ul>

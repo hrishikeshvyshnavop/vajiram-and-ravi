@@ -74,7 +74,7 @@ export default function RecipeLedger() {
         <div className="grid gap-6 md:grid-cols-[1.1fr_1fr] md:items-end">
           <div>
             <p data-pop="" className="rs-small text-[14px] opacity-80">
-              Since 1976 · <span lang="hi" className="rs-hi normal-case">स्थापना १९७६ · बही-खाता</span>
+              <span className="l-en">Since 1976 · </span><span lang="hi" className="rs-hi normal-case">स्थापना १९७६ · बही-खाता</span>
             </p>
             <h2 data-pop="" className="rs-display mt-4 text-[clamp(56px,7.4vw,120px)]">
               Tradition
@@ -95,10 +95,10 @@ export default function RecipeLedger() {
               {/* outside: red cloth, gold title, tied string */}
               <div className="rs-ledger-face rs-ledger-front">
                 <div className="rs-ledger-cloth">
-                  <p lang="hi" className="rs-hi text-[clamp(28px,3vw,44px)] text-[#f3d27a]">
+                  <p lang="hi" className="rs-hi text-[length:var(--rs-t2)] text-[#f3d27a]">
                     बही-खाता
                   </p>
-                  <p className="rs-display mt-3 text-[clamp(30px,3.2vw,52px)] text-[#f3d27a]">Vajiram &amp; Ravi</p>
+                  <p className="rs-display mt-3 text-[length:var(--rs-t2)] text-[#f3d27a]">Vajiram &amp; Ravi</p>
                   <p className="rs-small mt-3 tracking-[0.3em] text-[#f3d27a]/80">Estd. 1976 · New Delhi</p>
                 </div>
                 <span data-ledger-string="" className="rs-ledger-string" aria-hidden />
@@ -120,14 +120,14 @@ export default function RecipeLedger() {
               <span lang="hi" className="rs-hi">
                 खाता · परिणाम
               </span>
-              <span className="rs-small text-[11px] tracking-[0.2em]">Results account</span>
+              <span className="rs-small text-[12px] tracking-[0.2em]">Results account</span>
             </div>
             <ul className="mt-2">
               {results.map((r) => (
                 <li key={r.unit} className="rs-ledger-row rs-ledger-row--result">
                   <div data-ink="" className="min-w-0">
-                    <p className="rs-ledger-hand text-[clamp(18px,1.5vw,22px)] leading-tight">{r.text}</p>
-                    <p className="rs-small mt-1 text-[10px] tracking-[0.14em] opacity-60">{r.src}</p>
+                    <p className="rs-ledger-hand text-[length:var(--rs-lead)] leading-tight">{r.text}</p>
+                    <p className="rs-small mt-1 text-[12px] tracking-[0.14em] opacity-60">{r.src}</p>
                   </div>
                   <p className="rs-ledger-amount">
                     <span data-ledger-count={r.n} className="tabular-nums">
@@ -146,7 +146,7 @@ export default function RecipeLedger() {
             <div className="mt-auto flex items-end justify-between gap-4 pt-6">
               <div className="flex-1">
                 <span data-ledger-rule="" className="rs-ledger-double block origin-left" aria-hidden />
-                <p data-ink="" className="rs-ledger-hand mt-2 text-[clamp(20px,1.8vw,26px)]">
+                <p data-ink="" className="rs-ledger-hand mt-2 text-[length:var(--rs-t3)]">
                   Carried forward to 2027: <u className="decoration-[var(--ledger-red)] decoration-2 underline-offset-4">your name</u>
                 </p>
                 <a href="#enrol" className="rs-small mt-3 inline-block border-b-2 border-current pb-0.5 text-[12px] tracking-[0.14em]">
@@ -172,7 +172,7 @@ function LeftPage() {
         <span lang="hi" className="rs-hi">
           रोज़नामचा
         </span>
-        <span className="rs-small text-[11px] tracking-[0.2em]">Day book</span>
+        <span className="rs-small text-[12px] tracking-[0.2em]">Day book</span>
       </div>
       <ul className="mt-2">
         {dayBook.map((e) => (
@@ -183,7 +183,7 @@ function LeftPage() {
                 {e.hi}
               </span>
             </span>
-            <p data-ink="" className="rs-ledger-hand text-[clamp(17px,1.35vw,21px)] leading-snug">
+            <p data-ink="" className="rs-ledger-hand text-[length:var(--rs-lead)] leading-snug">
               {e.text}
             </p>
           </li>
@@ -194,7 +194,7 @@ function LeftPage() {
         <div className="relative aspect-[4/3] w-full overflow-hidden">
           <Image src="/v3/images/gallery/campus.webp" alt="The Vajiram & Ravi campus building with students outside" fill sizes="(min-width: 1024px) 18vw, 50vw" className="object-cover" />
         </div>
-        <figcaption className="rs-ledger-hand mt-1 text-center text-[15px]">The V&amp;R campus</figcaption>
+        <figcaption className="rs-ledger-hand mt-1 text-center text-[16px]">The V&amp;R campus</figcaption>
       </figure>
     </div>
   );

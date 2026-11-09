@@ -55,7 +55,7 @@ export default function RecipeResources() {
       <div className="rs-lib-wrap">
         <div className="rs-lib-intro">
           <p data-pop="" className="rs-lib-eyebrow">
-            Free resources · <span lang="hi" className="rs-hi normal-case">निःशुल्क संसाधन</span>
+            <span className="l-en">Free resources · </span><span lang="hi" className="rs-hi normal-case">निःशुल्क संसाधन</span>
           </p>
           <h2 id="lib-title" data-pop="" className="rs-lib-title">
             Your preparation

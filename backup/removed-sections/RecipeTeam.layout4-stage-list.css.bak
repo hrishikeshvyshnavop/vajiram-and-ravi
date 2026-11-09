@@ -1,0 +1,44 @@
+/* ---------- Team, layout 4, on the site's own design language (RecipeTeam.tsx; user 2026-11-09: "you have missing the design language in the faculty section") ----------
+   Brand paper (cream, faint block-print motif, grain), eyebrow + Hanken headline, a 24px saffron stage card with an arch-topped portrait, a ruled
+   list of large names (as in the Contact section), rust active row, pill chips, the square Btn. Replaces the blackboard (.rs-tb-* in
+   backup/removed-sections/RecipeTeam.blackboard.css.bak). Opaque ground: RecipeStory's scroll logic is anchored on #faculty. */
+.rs-tl { position: relative; z-index: 2; overflow: hidden; padding: var(--rs-sec-pad, 110px) 0; background: radial-gradient(ellipse at center, #fef8ec 0%, #fbf0d8 65%, #f2e3bf 100%); color: var(--rs-deep); }
+.rs-tl::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: url(/grain.png) repeat; background-size: 200px; opacity: 0.09; }
+.rs-tl-wrap { position: relative; z-index: 1; max-width: 1320px; margin: 0 auto; padding: 0 28px; }
+.rs-tl-eyebrow { margin: 0; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rs-rust); }
+.rs-tl-title { margin: 22px 0 0; font-family: var(--rs-body), sans-serif; font-weight: 700; letter-spacing: -0.03em; line-height: 1; font-size: var(--rs-h2); }
+.rs-tl-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 72px; align-items: center; margin-top: 56px; }
+.rs-tl-stage { position: relative; padding: 28px 28px 24px; border-radius: 24px; background: var(--rs-saffron); box-shadow: 0 0 0 1.5px rgba(141, 46, 19, 0.18), 0 22px 40px -20px rgba(70, 30, 12, 0.45); }
+.rs-tl-stage::after { content: ""; position: absolute; inset: 0; border-radius: 24px; pointer-events: none; background: url(/grain.png) repeat; background-size: 200px; mix-blend-mode: multiply; opacity: 0.1; }
+.rs-tl-frame { position: relative; z-index: 1; aspect-ratio: 4 / 5; overflow: hidden; border: 2.5px solid var(--rs-deep); border-radius: 999px 999px 18px 18px; background: #fff7e4; }
+.rs-tl-img { opacity: 0; transform: scale(1.04); transition: opacity 0.45s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.rs-tl-img.is-on { opacity: 1; transform: none; }
+.rs-tl-cap { position: relative; z-index: 1; padding-top: 18px; text-align: center; }
+.rs-tl-name { margin: 0; font-family: var(--rs-body), sans-serif; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; font-size: var(--rs-t2); color: var(--rs-deep); }
+.rs-tl-role { margin: 8px 0 0; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rs-rust); }
+.rs-tl-count { position: absolute; z-index: 2; top: 40px; right: 42px; padding: 4px 10px; border-radius: 999px; background: var(--rs-deep); color: var(--rs-saffron); font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; font-variant-numeric: tabular-nums; }
+.rs-tl-tabs { display: flex; flex-direction: column; border-top: 1.5px solid rgba(141, 46, 19, 0.35); }
+.rs-tl-tab { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: baseline; gap: 14px; padding: 20px 4px; border-bottom: 1.5px solid rgba(141, 46, 19, 0.35); text-align: left; color: rgba(141, 46, 19, 0.5); cursor: pointer; transition: color 0.25s ease, padding 0.25s ease; }
+.rs-tl-tab:hover { color: var(--rs-rust); }
+.rs-tl-tab.is-on { color: var(--rs-rust); padding-left: 16px; box-shadow: inset 4px 0 0 var(--rs-saffron); }
+.rs-tl-tab:focus-visible { outline: 2px solid var(--rs-rust); outline-offset: -2px; }
+.rs-tl-no { font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.1em; }
+.rs-tl-tname { font-family: var(--rs-body), sans-serif; font-weight: 700; letter-spacing: -0.04em; line-height: 1; font-size: var(--rs-t2); }
+.rs-tl-trole { text-align: right; font-family: var(--rs-display), sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
+.rs-tl-trole small { display: block; margin-top: 3px; font-size: 12px; font-weight: 600; opacity: 0.75; }
+.rs-tl-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 30px; }
+.rs-tl-foot p { margin: 0; flex: 1 1 220px; font-size: 16px; line-height: 1.45; color: rgba(42, 23, 16, 0.78); }
+.rs-tl-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.rs-tl-chips span { padding: 5px 11px; border: 1px solid var(--rs-rust); border-radius: 999px; font-family: var(--rs-display), sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rs-rust); background: rgba(255, 250, 241, 0.9); }
+@media (max-width: 1000px) {
+  .rs-tl-grid { grid-template-columns: 1fr; gap: 40px; }
+  .rs-tl-stage { max-width: 460px; }
+}
+@media (max-width: 560px) {
+  .rs-tl-stage { padding: 20px 18px 18px; }
+  .rs-tl-count { top: 30px; right: 30px; }
+  .rs-tl-tab { grid-template-columns: 30px minmax(0, 1fr); padding: 16px 2px; }
+  .rs-tl-trole { grid-column: 2; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { .rs-tl-img, .rs-tl-tab { transition: none; } }
+
